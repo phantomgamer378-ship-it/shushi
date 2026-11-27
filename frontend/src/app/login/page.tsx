@@ -39,29 +39,6 @@ export default function LoginPage() {
     }
   };
 
-  const handleQuickDemo = async () => {
-    setLoading(true);
-    setErrorMessage(null);
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/v1";
-      const res = await fetch(`${apiUrl}/auth/demo-session`, {
-        method: "POST",
-      });
-      const data = await res.json();
-      if (data.access_token) {
-        localStorage.setItem("shushi_demo_token", data.access_token);
-        localStorage.setItem("shushi_demo_user", "organizer@shushi.io");
-        router.push("/events");
-      } else {
-        throw new Error("Unable to establish demo session.");
-      }
-    } catch (err: any) {
-      setErrorMessage(err.message || "Demo access failed.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-[#0A0A0C] text-[#F4F0EA]">
       {/* Left Column: Editorial Brutalist Showcase (Inspired by Reference Design) */}
@@ -126,37 +103,6 @@ export default function LoginPage() {
           <p className="font-mono text-xs text-slate-400 mb-6">
             Authorized gate operators and event administrators only.
           </p>
-
-          {/* Instant 1-Click Access (Brutalist Crimson Button) */}
-          <div className="mb-6 p-4 border border-[#D72638] bg-[#D72638]/10 space-y-3">
-            <div className="flex items-center justify-between font-mono text-xs">
-              <span className="font-bold text-white uppercase tracking-wider">Instant Access</span>
-              <span className="bg-[#D72638] text-white px-2 py-0.5 text-[10px] font-bold uppercase">
-                1-Click
-              </span>
-            </div>
-            <p className="font-mono text-[11px] text-slate-300">
-              Open the <strong>Shushi</strong> event workspace, live QR scanner, and guest roster immediately.
-            </p>
-            <button
-              type="button"
-              onClick={handleQuickDemo}
-              disabled={loading}
-              className="w-full py-2.5 bg-[#D72638] hover:bg-[#BF1E2F] text-white font-mono font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:translate-y-0.5"
-            >
-              <span>Enter Shushi Console</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          <div className="relative flex items-center justify-center my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#27272A]" />
-            </div>
-            <span className="relative px-3 bg-[#121214] font-mono text-[10px] uppercase tracking-widest text-slate-500">
-              Or Authenticate with Email
-            </span>
-          </div>
 
           {errorMessage && (
             <div

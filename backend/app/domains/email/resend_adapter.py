@@ -4,7 +4,7 @@ from typing import Optional, Dict, Any
 import resend
 from app.core.config import settings
 
-logger = logging.getLogger("eventflow.email")
+logger = logging.getLogger("shushi.email")
 
 
 class ResendEmailAdapter:
@@ -24,37 +24,40 @@ class ResendEmailAdapter:
         qr_png_bytes: bytes,
     ) -> Dict[str, Any]:
         """Dispatches digital ticket email with attached QR code PNG."""
-        subject = f"Your Ticket: {event_title}"
+        subject = f"Admission Pass: {event_title}"
 
-        # HTML email template
+        # HTML email template (Editorial Brutalist Theme)
         html_content = f"""
         <!DOCTYPE html>
         <html>
         <head>
           <style>
-            body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0b0f19; color: #f3f4f6; padding: 24px; }}
-            .card {{ max-width: 520px; margin: 0 auto; background: #111827; border: 1px solid #1f2937; border-radius: 16px; padding: 32px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }}
-            h1 {{ font-size: 24px; margin-bottom: 8px; color: #ffffff; }}
-            .badge {{ display: inline-block; padding: 4px 12px; background: rgba(99, 102, 241, 0.15); color: #818cf8; border-radius: 9999px; font-size: 13px; font-weight: 600; margin-bottom: 24px; }}
-            .details {{ margin: 20px 0; border-top: 1px solid #1f2937; border-bottom: 1px solid #1f2937; padding: 16px 0; }}
-            .details p {{ margin: 6px 0; color: #9ca3af; font-size: 14px; }}
-            .details strong {{ color: #e5e7eb; }}
-            .qr-notice {{ text-align: center; margin-top: 24px; padding: 16px; background: #1e293b; border-radius: 8px; font-size: 13px; color: #94a3b8; }}
+            body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace; background-color: #0A0A0C; color: #F4F0EA; padding: 24px; margin: 0; }}
+            .card {{ max-width: 520px; margin: 0 auto; background: #121214; border: 1px solid #27272A; padding: 32px; border-top: 4px solid #D72638; }}
+            .brand {{ font-family: monospace; font-size: 11px; font-weight: bold; letter-spacing: 2px; color: #D72638; text-transform: uppercase; margin-bottom: 12px; }}
+            h1 {{ font-size: 26px; margin: 0 0 8px 0; color: #FFFFFF; font-weight: 900; text-transform: uppercase; }}
+            .badge {{ display: inline-block; padding: 4px 10px; background: #D72638; color: #FFFFFF; font-family: monospace; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 20px; }}
+            .details {{ margin: 20px 0; border-top: 1px solid #27272A; border-bottom: 1px solid #27272A; padding: 16px 0; font-family: monospace; }}
+            .details p {{ margin: 8px 0; color: #A1A1AA; font-size: 13px; }}
+            .details strong {{ color: #FFFFFF; }}
+            .qr-notice {{ text-align: center; margin-top: 24px; padding: 16px; background: #18181B; border: 1px solid #27272A; font-family: monospace; font-size: 12px; color: #D4D4D8; }}
           </style>
         </head>
         <body>
           <div class="card">
-            <span class="badge">Confirmed Admission</span>
-            <h1>Hello, {attendee_name}!</h1>
-            <p>Your digital ticket for <strong>{event_title}</strong> is confirmed.</p>
+            <div class="brand">SHUSHI // ADMISSION GATEWAY</div>
+            <span class="badge">CONFIRMED PASS</span>
+            <h1>{attendee_name}</h1>
+            <p style="font-family: monospace; font-size: 13px; color: #A1A1AA;">Your digital pass for <strong>{event_title}</strong> is verified.</p>
             
             <div class="details">
-              <p><strong>Venue:</strong> {venue_name}</p>
-              <p><strong>Time:</strong> {start_time_str}</p>
+              <p><strong>VENUE:</strong> {venue_name}</p>
+              <p><strong>TIME:</strong> {start_time_str}</p>
             </div>
 
             <div class="qr-notice">
-              Your entrance QR code is attached to this email. Please present it at the check-in gate for instant scanning.
+              <strong>ZERO-PII QR PASS ATTACHED</strong><br>
+              Please present the attached QR code at any entry checkpoint for sub-second atomic scan.
             </div>
           </div>
         </body>
@@ -62,7 +65,7 @@ class ResendEmailAdapter:
         """
 
         attachment = {
-            "filename": "eventflow_ticket_qr.png",
+            "filename": "shushi_ticket_pass.png",
             "content": list(qr_png_bytes),
         }
 
