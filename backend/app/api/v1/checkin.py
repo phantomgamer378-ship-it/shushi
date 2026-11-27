@@ -120,3 +120,45 @@ async def process_gate_check_in(
         "checked_in_at": checkin_record.checked_in_at.isoformat(),
         "message": f"Welcome, {attendee_name}!",
     }
+
+
+class CheckInItemResponse(BaseModel):
+    id: UUID
+    ticket_id: UUID
+    attendee_name: str
+    gate_name: str
+    checked_in_at: str
+    staff_id: Optional[UUID] = None
+
+
+@router.get("/check-ins", response_model=list[CheckInItemResponse])
+async def list_event_checkins(
+    event_id: UUID,
+    limit: int = 50,
+    context: EventStaffContext = Depends(require_event_role(EventRole.VIEWER)),
+    db: AsyncSession = Depends(get_db_session),
+):
+    """Lists recent gate check-ins with attendee details for live dashboards."""
+    stmt = (
+        select(CheckIn, Registration.attendee_name)
+        .join(Ticket, CheckIn.ticket_id == Ticket.id)
+        .join(Registration, Ticket.registration_id == Registration.id)
+        .where(CheckIn.event_id == event_id)
+        .order_by(CheckIn.checked_in_at.desc())
+        .limit(limit)
+    )
+    result = await db.execute(stmt)
+    records = result.all()
+
+    return [
+        CheckInItemResponse(
+            id=checkin.id,
+            ticket_id=checkin.ticket_id,
+            attendee_name=attendee_name or "Attendee",
+            gate_name=checkin.gate_name,
+            checked_in_at=checkin.checked_in_at.isoformat(),
+            staff_id=checkin.staff_id,
+        )
+        for checkin, attendee_name in records
+    ]
+

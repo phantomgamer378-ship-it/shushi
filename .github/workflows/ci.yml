@@ -1,0 +1,68 @@
+name: EventFlow CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+
+jobs:
+  backend-test:
+    name: Backend Test Suite & Concurrency Verification
+    runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: test
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://jkchyjghuaiyulxqzobl.supabase.co' }}
+      SUPABASE_JWT_SECRET: ${{ secrets.SUPABASE_JWT_SECRET || 'fcc288de9da25ac8db036de254daa9aae95e1051-jwt-secret-mumbai-2026' }}
+      DATA_ENCRYPTION_KEY: ${{ secrets.DATA_ENCRYPTION_KEY || 'k7b9X2pL0mQ8vR4tY1wZ6aC3eF5uI9oP4sD8gJ2hK1l=' }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql+asyncpg://postgres.jkchyjghuaiyulxqzobl:EventFlow2026!SecureMumbaiDB@aws-1-ap-south-1.pooler.supabase.com:6543/postgres' }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Pytest Test Suite
+        run: |
+          cd backend
+          pytest tests/ -v --durations=10
+
+  frontend-build:
+    name: Frontend Build & Typecheck
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://jkchyjghuaiyulxqzobl.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprY2h5amdodWFpeXVseHF6b2JsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU3NjIzODQsImV4cCI6MjExMTMzODM4NH0.v_C6A2sm9VXYYPrION_hE2Fd6MzmJhoqkjE_P0MN6iI
+      NEXT_PUBLIC_API_URL: https://api.eventflow.io/v1
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: frontend/package.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Build Next.js PWA Production Bundle
+        run: |
+          cd frontend
+          npm run build
