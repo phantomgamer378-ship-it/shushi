@@ -3,20 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
-import {
-  QrCode,
-  Mail,
-  Lock,
-  ArrowRight,
-  ShieldCheck,
-  AlertCircle,
-  Eye,
-  EyeOff,
-  Sparkles,
-  CheckCircle2,
-} from "lucide-react";
+import { QrCode, ArrowRight, ShieldCheck, AlertCircle, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -38,32 +26,14 @@ export default function LoginPage() {
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-        setSuccessMessage("Account created! Check your email for verification link, or sign in.");
+        setSuccessMessage("Account created. Check your email or sign in directly.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         router.push("/events");
       }
     } catch (err: any) {
-      setErrorMessage(err.message || "Authentication failed. Please verify credentials.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleMagicLink = async () => {
-    if (!email) {
-      setErrorMessage("Please enter your email address first to receive a magic link.");
-      return;
-    }
-    setLoading(true);
-    setErrorMessage(null);
-    try {
-      const { error } = await supabase.auth.signInWithOtp({ email });
-      if (error) throw error;
-      setSuccessMessage("Magic login link sent! Check your inbox.");
-    } catch (err: any) {
-      setErrorMessage(err.message || "Failed to send magic link.");
+      setErrorMessage(err.message || "Authentication failed. Check credentials.");
     } finally {
       setLoading(false);
     }
@@ -93,111 +63,107 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#10172A] text-slate-100 relative overflow-hidden">
-      {/* Controlled Ambient Background Glow */}
-      <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#635BFF]/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-32 right-0 w-96 h-96 bg-[#36C8E8]/10 rounded-full blur-3xl pointer-events-none" />
-
-      {/* Left Column: Desktop 3D Spatial Digital Ticket Showcase */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 border-r border-white/10 bg-[#18233D]/40 relative z-10">
-        <div className="flex items-center gap-3 font-display font-bold text-xl tracking-tight text-white">
-          <div className="w-9 h-9 rounded-[10px] bg-gradient-to-tr from-[#635BFF] to-[#36C8E8] flex items-center justify-center text-white shadow-lg shadow-[#635BFF]/30">
-            <QrCode className="w-5 h-5" />
+    <div className="min-h-screen flex flex-col lg:flex-row bg-[#0A0A0C] text-[#F4F0EA]">
+      {/* Left Column: Editorial Brutalist Showcase (Inspired by Reference Design) */}
+      <div className="lg:w-1/2 flex flex-col justify-between p-8 sm:p-14 bg-[#EDE8DF] text-[#0A0A0C] border-b lg:border-b-0 lg:border-r border-[#27272A] relative overflow-hidden">
+        {/* Top Header Tag */}
+        <div className="flex items-center justify-between font-mono text-xs uppercase tracking-widest text-[#0A0A0C]/70">
+          <div className="flex items-center gap-3">
+            <span className="w-6 h-6 bg-[#0A0A0C] text-[#EDE8DF] font-bold flex items-center justify-center">
+              SH
+            </span>
+            <span className="font-bold text-[#0A0A0C]">SHUSHI // 2026</span>
           </div>
-          <span>Shushi</span>
-        </div>
-
-        {/* 3D Perspective Digital Ticket */}
-        <div className="my-auto flex flex-col items-center justify-center perspective-1000">
-          <motion.div
-            initial={{ rotateX: 8, rotateY: -12, opacity: 0, y: 16 }}
-            animate={{ rotateX: 4, rotateY: -6, opacity: 1, y: 0 }}
-            whileHover={{ rotateX: 0, rotateY: 0, scale: 1.02 }}
-            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="w-full max-w-sm rounded-[24px] p-6 bg-gradient-to-br from-[#18233D] via-[#10172A] to-[#0f172a] border border-white/15 shadow-2xl preserve-3d relative overflow-hidden"
-          >
-            {/* Subtle specular reflection */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.04] to-transparent pointer-events-none" />
-
-            <div className="flex items-center justify-between mb-6">
-              <span className="text-[10px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-full bg-[#635BFF]/20 text-[#36C8E8] border border-[#36C8E8]/30">
-                VERIFIED PASS
-              </span>
-              <span className="font-mono text-xs text-slate-400">ef:v1:9f82...a41c</span>
-            </div>
-
-            <h2 className="font-display text-xl font-bold text-white mb-1">
-              Shushi Fresher Party 2026
-            </h2>
-            <p className="text-xs text-slate-400 mb-6">Main Campus Auditorium • Gate A1</p>
-
-            <div className="p-4 rounded-[16px] bg-white flex items-center justify-between mb-5 shadow-inner">
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  Cryptographic Credential
-                </div>
-                <div className="font-display font-bold text-slate-900 text-sm">
-                  Zero-PII QR Token
-                </div>
-                <div className="flex items-center gap-1 text-[11px] font-semibold text-[#16A34A]">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>256-bit Entropy</span>
-                </div>
-              </div>
-              <div className="w-16 h-16 rounded-lg bg-slate-900 flex items-center justify-center text-white">
-                <QrCode className="w-10 h-10" />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between text-[11px] text-slate-400 pt-3 border-t border-white/10">
-              <span>Atomic Gate Locking</span>
-              <span className="font-mono text-[#36C8E8]">SELECT FOR UPDATE</span>
-            </div>
-          </motion.div>
-
-          <div className="mt-10 text-center max-w-md">
-            <h3 className="font-display text-2xl font-bold text-white tracking-tight">
-              The future of effortless event management.
-            </h3>
-            <p className="text-sm text-slate-400 mt-2 leading-relaxed">
-              Ingest Google Forms RSVPs, issue zero-PII cryptographic passes, and verify gate entry in sub-second atomic transactions.
-            </p>
+          <div className="flex items-center gap-1.5 font-bold">
+            <span className="w-2 h-2 rounded-full bg-[#D72638]" />
+            <span className="text-[#D72638]">ACTIVE GATEWAY</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-slate-400">
-          <Sparkles className="w-4 h-4 text-[#36C8E8]" />
-          <span>Powered by Supabase Auth & PostgreSQL Mumbai (`ap-south-1`)</span>
+        {/* Hero Section */}
+        <div className="my-12 max-w-lg">
+          <div className="font-mono text-xs text-[#0A0A0C]/60 uppercase tracking-widest mb-3">
+            A4 // EVENT ACCESS INFRASTRUCTURE
+          </div>
+          <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-black uppercase tracking-tight text-[#0A0A0C] leading-[0.92]">
+            SHUSHI
+          </h1>
+          <p className="font-mono text-xs sm:text-sm text-[#0A0A0C]/80 mt-6 leading-relaxed">
+            High-throughput event management, signed Google Forms webhooks, and atomic QR code admission control.
+          </p>
+
+          {/* Red Accent Ribbon (Referenced directly from uploaded design) */}
+          <div className="mt-8 -mx-8 sm:-mx-14 py-3 bg-[#D72638] text-white font-mono text-xs sm:text-sm font-black tracking-widest uppercase overflow-hidden whitespace-nowrap shadow-sm">
+            <div className="flex items-center gap-6 px-4">
+              <span>✦ POSTGRESQL</span>
+              <span>✦ FASTAPI</span>
+              <span>✦ ATOMIC SCANNER</span>
+              <span>✦ NEXT.JS</span>
+              <span>✦ ZERO-PII QR</span>
+              <span>✦ SUPABASE</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Technical Guarantee Footer */}
+        <div className="font-mono text-[11px] text-[#0A0A0C]/60 flex items-center justify-between border-t border-[#0A0A0C]/15 pt-4 uppercase">
+          <span>01 // CRYPTOGRAPHIC ADMISSION</span>
+          <span>POSTGRES 17 MUMBAI</span>
         </div>
       </div>
 
-      {/* Right Column: Authentication Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative z-10">
-        <div className="w-full max-w-md glass-panel p-8 rounded-[24px] border border-white/10 shadow-2xl">
-          <div className="flex lg:hidden flex-col items-center text-center mb-6">
-            <div className="w-11 h-11 rounded-[10px] bg-gradient-to-tr from-[#635BFF] to-[#36C8E8] flex items-center justify-center text-white shadow-lg shadow-[#635BFF]/25 mb-3">
-              <QrCode className="w-5 h-5" />
-            </div>
-            <h1 className="font-display text-2xl font-bold text-white">Shushi</h1>
+      {/* Right Column: High-Contrast Minimalist Console Login */}
+      <div className="lg:w-1/2 flex items-center justify-center p-6 sm:p-14 bg-[#0A0A0C]">
+        <div className="w-full max-w-md editorial-card bg-[#121214] p-8 sm:p-10 border border-[#27272A] shadow-brutal">
+          <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-wider text-slate-400 mb-6">
+            <span className="text-[#D72638] font-bold">02 // CONSOLE</span>
+            <span>STAFF LOGIN</span>
           </div>
 
-          <div className="mb-7">
-            <h2 className="font-display text-2xl font-bold tracking-tight text-white">
-              {isSignUp ? "Create Staff Account" : "Sign in to Console"}
-            </h2>
-            <p className="text-sm text-slate-400 mt-1">
-              {isSignUp
-                ? "Register with your organizer email address."
-                : "Access your event dashboards, attendee rosters, and gate scanners."}
+          <h2 className="font-display text-3xl font-black uppercase text-white tracking-tight mb-2">
+            {isSignUp ? "Create Staff Access" : "Sign In to Shushi"}
+          </h2>
+          <p className="font-mono text-xs text-slate-400 mb-6">
+            Authorized gate operators and event administrators only.
+          </p>
+
+          {/* Instant 1-Click Access (Brutalist Crimson Button) */}
+          <div className="mb-6 p-4 border border-[#D72638] bg-[#D72638]/10 space-y-3">
+            <div className="flex items-center justify-between font-mono text-xs">
+              <span className="font-bold text-white uppercase tracking-wider">Instant Access</span>
+              <span className="bg-[#D72638] text-white px-2 py-0.5 text-[10px] font-bold uppercase">
+                1-Click
+              </span>
+            </div>
+            <p className="font-mono text-[11px] text-slate-300">
+              Open the <strong>Shushi</strong> event workspace, live QR scanner, and guest roster immediately.
             </p>
+            <button
+              type="button"
+              onClick={handleQuickDemo}
+              disabled={loading}
+              className="w-full py-2.5 bg-[#D72638] hover:bg-[#BF1E2F] text-white font-mono font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:translate-y-0.5"
+            >
+              <span>Enter Shushi Console</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="relative flex items-center justify-center my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#27272A]" />
+            </div>
+            <span className="relative px-3 bg-[#121214] font-mono text-[10px] uppercase tracking-widest text-slate-500">
+              Or Authenticate with Email
+            </span>
           </div>
 
           {errorMessage && (
             <div
               role="alert"
-              className="mb-5 p-3.5 rounded-[10px] bg-[#DC4545]/10 border border-[#DC4545]/25 text-red-300 text-xs flex items-center gap-2.5"
+              className="mb-4 p-3 border border-[#D72638] bg-[#D72638]/15 text-[#D72638] font-mono text-xs flex items-center gap-2"
             >
-              <AlertCircle className="w-4 h-4 shrink-0 text-[#DC4545]" />
+              <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMessage}</span>
             </div>
           )}
@@ -205,106 +171,65 @@ export default function LoginPage() {
           {successMessage && (
             <div
               role="status"
-              className="mb-5 p-3.5 rounded-[10px] bg-[#16A34A]/10 border border-[#16A34A]/25 text-emerald-300 text-xs flex items-center gap-2.5"
+              className="mb-4 p-3 border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-mono text-xs flex items-center gap-2"
             >
-              <ShieldCheck className="w-4 h-4 shrink-0 text-[#16A34A]" />
+              <ShieldCheck className="w-4 h-4 shrink-0" />
               <span>{successMessage}</span>
             </div>
           )}
-
-          {/* Instant 1-Click Demo Access Box */}
-          <div className="mb-6 p-4 rounded-[16px] bg-gradient-to-r from-[#635BFF]/15 to-[#36C8E8]/15 border border-[#36C8E8]/30 flex flex-col gap-2.5 shadow-lg shadow-[#635BFF]/10">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-bold text-white">
-                <Sparkles className="w-4 h-4 text-[#36C8E8]" />
-                <span>Instant Demo Access</span>
-              </div>
-              <span className="text-[10px] font-mono uppercase bg-[#16A34A]/20 text-emerald-400 px-2 py-0.5 rounded-full font-semibold border border-[#16A34A]/30">
-                Active
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-300 leading-relaxed">
-              Explore the <strong>Shushi Fresher Party 2026</strong> event dashboard, live gate scanner, and attendee passes without typing credentials.
-            </p>
-            <button
-              type="button"
-              onClick={handleQuickDemo}
-              disabled={loading}
-              className="w-full py-2.5 px-3 rounded-[10px] bg-gradient-to-r from-[#635BFF] to-[#36C8E8] hover:opacity-95 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-[#635BFF]/25 active:scale-[0.99] transition-all"
-            >
-              <span>⚡ Enter Shushi Console (1-Click)</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          <div className="relative flex items-center justify-center mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10" />
-            </div>
-            <span className="relative px-3 bg-[#111827] text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
-              Or Sign In With Email
-            </span>
-          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
                 htmlFor="login-email"
-                className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5"
+                className="block font-mono text-[11px] uppercase tracking-wider text-slate-400 mb-1"
               >
                 Email Address
               </label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  id="login-email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="organizer@shushi.io"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-[10px] bg-slate-900/80 border border-white/10 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#635BFF]"
-                />
-              </div>
+              <input
+                id="login-email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="organizer@shushi.io"
+                className="w-full px-3.5 py-2.5 bg-[#0A0A0C] border border-[#27272A] text-white font-mono text-xs focus:outline-none focus:border-[#D72638]"
+              />
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center justify-between mb-1">
                 <label
                   htmlFor="login-password"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-300"
+                  className="block font-mono text-[11px] uppercase tracking-wider text-slate-400"
                 >
                   Password
                 </label>
                 {!isSignUp && (
                   <Link
                     href="/forgot-password"
-                    className="text-xs text-[#36C8E8] hover:underline"
+                    className="font-mono text-[11px] text-slate-400 hover:text-[#D72638]"
                   >
-                    Forgot password?
+                    Forgot?
                   </Link>
                 )}
               </div>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   id="login-password"
                   type={showPassword ? "text" : "password"}
                   required
-                  autoComplete={isSignUp ? "new-password" : "current-password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 rounded-[10px] bg-slate-900/80 border border-white/10 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#635BFF]"
+                  className="w-full px-3.5 py-2.5 bg-[#0A0A0C] border border-[#27272A] text-white font-mono text-xs focus:outline-none focus:border-[#D72638]"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                 </button>
               </div>
             </div>
@@ -312,28 +237,14 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 rounded-[10px] bg-[#635BFF] hover:bg-[#5249F5] active:scale-[0.99] text-white text-sm font-semibold shadow-lg shadow-[#635BFF]/30 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+              className="w-full py-2.5 bg-white text-black hover:bg-slate-200 font-mono font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 border border-white transition-all disabled:opacity-50"
             >
-              <span>
-                {loading
-                  ? "Authenticating..."
-                  : isSignUp
-                  ? "Create Staff Account"
-                  : "Sign In to Console"}
-              </span>
+              <span>{loading ? "Authenticating..." : isSignUp ? "Create Staff Access" : "Sign In"}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
 
-          <div className="mt-6 flex flex-col gap-3 text-center border-t border-white/10 pt-5">
-            <button
-              type="button"
-              onClick={handleMagicLink}
-              disabled={loading}
-              className="text-xs font-medium text-[#36C8E8] hover:text-cyan-300 transition-colors"
-            >
-              Send passwordless magic link via email
-            </button>
+          <div className="mt-6 pt-4 border-t border-[#27272A] text-center font-mono text-[11px]">
             <button
               type="button"
               onClick={() => {
@@ -341,11 +252,9 @@ export default function LoginPage() {
                 setErrorMessage(null);
                 setSuccessMessage(null);
               }}
-              className="text-xs text-slate-400 hover:text-white transition-colors"
+              className="text-slate-400 hover:text-white"
             >
-              {isSignUp
-                ? "Already have an account? Sign In"
-                : "New organizer? Create a staff account"}
+              {isSignUp ? "Already registered? Sign In" : "Need access? Request Staff Registration"}
             </button>
           </div>
         </div>

@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { apiClient } from "@/lib/api";
-import { Copy, Check, ShieldAlert, Key, Globe, FileCode, CheckCircle2 } from "lucide-react";
+import { Copy, Check, ShieldAlert, Globe, FileCode } from "lucide-react";
+import { Button } from "@/components/ui/Primitives";
 
 interface EventDetail {
   id: string;
@@ -33,7 +34,7 @@ export default function EventSettingsPage() {
 
   const webhookUrl = typeof window !== "undefined"
     ? `${window.location.origin.replace(":3000", ":8000")}/v1/webhooks/google-forms/${event?.id || eventId}`
-    : `https://api.eventflow.io/v1/webhooks/google-forms/${event?.id || eventId}`;
+    : `https://api.shushi.io/v1/webhooks/google-forms/${event?.id || eventId}`;
 
   const sampleAppsScript = `/**
  * Google Apps Script Webhook Forwarder for Shushi
@@ -95,79 +96,87 @@ function onFormSubmit(e) {
   };
 
   return (
-    <div className="space-y-8 max-w-4xl">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-white">Google Forms Webhook Configuration</h1>
-        <p className="text-xs text-slate-400 mt-1">
-          Connect your Google Form or Google Sheet to Shushi for instant, cryptographically verified RSVP ingestion.
+    <div className="space-y-6 max-w-4xl">
+      {/* Editorial Header */}
+      <div className="pb-4 border-b border-pitch/10 dark:border-white/10">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="w-2 h-2 bg-crimson inline-block" />
+          <span className="font-mono text-[11px] font-bold tracking-widest uppercase text-pitch/60 dark:text-cream/60">
+            06 // INGESTION INTEGRATION
+          </span>
+        </div>
+        <h1 className="font-display text-3xl font-black tracking-tight text-pitch dark:text-cream uppercase">
+          Google Forms Webhook Configuration
+        </h1>
+        <p className="font-mono text-xs text-pitch/60 dark:text-cream/60 mt-1">
+          Stream submissions directly from Google Forms into Shushi with timing-safe HMAC-SHA256 validation.
         </p>
       </div>
 
       {/* Inbound Endpoint Box */}
-      <div className="glass-panel p-6 rounded-2xl border border-white/10 space-y-4">
-        <div className="flex items-center gap-2 text-indigo-400 font-semibold text-sm">
-          <Globe className="w-4 h-4" />
-          <span>Inbound Webhook Endpoint URL</span>
+      <div className="editorial-card p-6 space-y-4">
+        <div className="flex items-center gap-2 font-mono text-xs font-bold uppercase text-pitch dark:text-cream">
+          <Globe className="w-4 h-4 text-crimson" />
+          <span>INBOUND WEBHOOK ENDPOINT</span>
         </div>
-        <p className="text-xs text-slate-400">
-          This is the dedicated webhook URL for event <strong className="text-slate-200">{event?.title}</strong>. All submissions sent here require HMAC-SHA256 signature verification.
+        <p className="font-mono text-xs text-pitch/70 dark:text-cream/70">
+          Dedicated endpoint for event <strong className="text-pitch dark:text-cream">{event?.title || "Shushi"}</strong>. All inbound POST requests require constant-time HMAC signatures.
         </p>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 font-mono text-xs">
           <input
             type="text"
             readOnly
             value={webhookUrl}
-            className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/10 font-mono text-xs text-slate-200 select-all"
+            className="flex-1 px-3.5 py-2.5 bg-sand dark:bg-carbon border border-pitch/20 dark:border-white/15 text-pitch dark:text-cream select-all focus:outline-none"
           />
-          <button
-            onClick={() => copyToClipboard(webhookUrl, setCopiedUrl)}
-            className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors"
-          >
-            {copiedUrl ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copiedUrl ? "Copied" : "Copy"}</span>
-          </button>
+          <Button size="sm" onClick={() => copyToClipboard(webhookUrl, setCopiedUrl)}>
+            {copiedUrl ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5" />}
+            <span>{copiedUrl ? "COPIED" : "COPY"}</span>
+          </Button>
         </div>
       </div>
 
       {/* Step by Step Setup */}
-      <div className="glass-panel p-6 rounded-2xl border border-white/10 space-y-4">
-        <div className="flex items-center gap-2 text-indigo-400 font-semibold text-sm">
-          <FileCode className="w-4 h-4" />
-          <span>Google Apps Script Setup (3-Step Guide)</span>
+      <div className="editorial-card p-6 space-y-4 font-mono text-xs">
+        <div className="flex items-center gap-2 font-bold uppercase text-pitch dark:text-cream">
+          <FileCode className="w-4 h-4 text-crimson" />
+          <span>Google Apps Script Setup (3-Step Pipeline)</span>
         </div>
 
-        <ol className="space-y-3 text-xs text-slate-300 list-decimal list-inside leading-relaxed">
+        <ol className="space-y-3 text-pitch/80 dark:text-cream/80 list-decimal list-inside leading-relaxed text-[11px]">
           <li>
-            Open your Google Form or connected Google Sheet, click <strong className="text-white">Extensions &gt; Apps Script</strong>.
+            Open your target Google Form or linked Google Sheet, click <strong className="text-pitch dark:text-cream font-bold">Extensions &gt; Apps Script</strong>.
           </li>
           <li>
-            Paste the script below into the code editor, replacing <code className="text-indigo-400 font-mono">PASTE_YOUR_EVENT_WEBHOOK_SECRET_HERE</code> with the webhook secret generated when creating the event.
+            Paste the script below into the code editor, substituting <code className="text-crimson font-bold">PASTE_YOUR_EVENT_WEBHOOK_SECRET_HERE</code> with the webhook secret.
           </li>
           <li>
-            In Apps Script, click <strong className="text-white">Triggers</strong> (alarm icon in left sidebar) &gt; <strong className="text-white">Add Trigger</strong> &gt; Select function <strong className="text-white">onFormSubmit</strong> &gt; Event type: <strong className="text-white">On form submit</strong>.
+            In Apps Script, click <strong className="text-pitch dark:text-cream font-bold">Triggers</strong> (alarm icon) &gt; <strong className="text-pitch dark:text-cream font-bold">Add Trigger</strong> &gt; Select function <strong className="text-pitch dark:text-cream font-bold">onFormSubmit</strong> &gt; Event type: <strong className="text-pitch dark:text-cream font-bold">On form submit</strong>.
           </li>
         </ol>
 
         <div className="relative mt-4">
           <button
             onClick={() => copyToClipboard(sampleAppsScript, setCopiedScript)}
-            className="absolute top-3 right-3 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[11px] font-semibold flex items-center gap-1.5 transition-colors z-10"
+            className="absolute top-3 right-3 px-3 py-1 bg-sand dark:bg-carbon border border-pitch/20 dark:border-white/20 text-pitch dark:text-cream text-[10px] font-bold uppercase flex items-center gap-1.5 transition-colors z-10"
           >
-            {copiedScript ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-            <span>{copiedScript ? "Copied Script" : "Copy Script"}</span>
+            {copiedScript ? <Check className="w-3 h-3 text-[#16A34A]" /> : <Copy className="w-3 h-3" />}
+            <span>{copiedScript ? "COPIED CODE" : "COPY CODE"}</span>
           </button>
-          <pre className="p-4 rounded-xl bg-slate-900 border border-white/10 font-mono text-[11px] text-slate-300 overflow-x-auto leading-relaxed max-h-96">
+          <pre className="p-4 bg-sand dark:bg-carbon border border-pitch/15 dark:border-white/10 font-mono text-[11px] text-pitch/90 dark:text-cream/90 overflow-x-auto leading-relaxed max-h-96">
             {sampleAppsScript}
           </pre>
         </div>
       </div>
 
-      {/* Security note */}
-      <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs flex items-start gap-3">
-        <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+      {/* Cryptographic note */}
+      <div className="p-4 bg-pitch text-cream dark:bg-cream dark:text-pitch border-l-4 border-crimson font-mono text-xs flex items-start gap-3">
+        <ShieldAlert className="w-4 h-4 text-crimson shrink-0 mt-0.5" />
         <div>
-          <strong className="font-semibold block mb-0.5">Cryptographic Integrity Guarantee</strong>
-          Every incoming webhook payload is checked using timing-safe constant-time HMAC-SHA256 comparison. Unsigned requests, replayed response IDs, or invalid digests are immediately rejected with RFC 7807 problem details.
+          <strong className="font-bold block mb-0.5 uppercase tracking-wider">
+            CRYPTOGRAPHIC INTEGRITY GUARANTEE
+          </strong>
+          Every incoming webhook payload is verified using timing-safe constant-time HMAC-SHA256 comparison. Unsigned requests or replayed response IDs are rejected with RFC 7807 problem details.
         </div>
       </div>
     </div>

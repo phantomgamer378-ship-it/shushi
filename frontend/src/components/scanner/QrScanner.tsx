@@ -120,7 +120,7 @@ export function QrScanner({ eventId }: { eventId: string }) {
         setScannerState("NETWORK_ERROR");
         setLastScanResult({
           state: "NETWORK_ERROR",
-          title: "Offline — Entry Blocked",
+          title: "OFFLINE — ENTRY BLOCKED",
           detail: "Verification unavailable offline. Never grant entry without server confirmation.",
           timestamp: new Date().toLocaleTimeString(),
         });
@@ -147,7 +147,7 @@ export function QrScanner({ eventId }: { eventId: string }) {
         setSessionStats((s) => ({ ...s, admitted: s.admitted + 1 }));
         setLastScanResult({
           state: "SUCCESS",
-          title: "Admission Granted",
+          title: "ADMISSION GRANTED",
           attendeeName: response.attendee_name,
           detail: `Gate: ${response.gate_name}`,
           timestamp: new Date(response.checked_in_at).toLocaleTimeString(),
@@ -159,7 +159,7 @@ export function QrScanner({ eventId }: { eventId: string }) {
             setScannerState("DUPLICATE");
             setLastScanResult({
               state: "DUPLICATE",
-              title: "Already Checked In",
+              title: "ALREADY CHECKED IN",
               detail: err.problem.detail,
               timestamp: new Date().toLocaleTimeString(),
             });
@@ -167,7 +167,7 @@ export function QrScanner({ eventId }: { eventId: string }) {
             setScannerState("REVOKED");
             setLastScanResult({
               state: "REVOKED",
-              title: "Ticket Revoked",
+              title: "TICKET REVOKED",
               detail: "This ticket has been revoked by event organizers.",
               timestamp: new Date().toLocaleTimeString(),
             });
@@ -175,7 +175,7 @@ export function QrScanner({ eventId }: { eventId: string }) {
             setScannerState("INVALID");
             setLastScanResult({
               state: "INVALID",
-              title: "Invalid Ticket",
+              title: "INVALID TICKET",
               detail: err.problem.detail || "Ticket not recognized for this event.",
               timestamp: new Date().toLocaleTimeString(),
             });
@@ -184,7 +184,7 @@ export function QrScanner({ eventId }: { eventId: string }) {
           setScannerState("NETWORK_ERROR");
           setLastScanResult({
             state: "NETWORK_ERROR",
-            title: "Verification Unavailable",
+            title: "VERIFICATION UNAVAILABLE",
             detail: "Unable to reach backend. Fail closed.",
             timestamp: new Date().toLocaleTimeString(),
           });
@@ -277,79 +277,79 @@ export function QrScanner({ eventId }: { eventId: string }) {
   };
 
   return (
-    <div className="max-w-md mx-auto flex flex-col gap-4 bg-[#10172A] text-white p-4 rounded-[24px] border border-white/10 shadow-2xl">
+    <div className="flex flex-col gap-4 bg-pitch text-cream p-5 border border-pitch/20 dark:border-white/20 shadow-brutal">
       {/* Top Status Bar: Network, Gate, Counters */}
-      <div className="flex items-center justify-between gap-2 text-xs">
+      <div className="flex items-center justify-between gap-2 text-xs font-mono uppercase pb-3 border-b border-white/10">
         <div
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full font-semibold ${
+          className={`flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold border ${
             isOnline
-              ? "bg-[#16A34A]/15 text-emerald-400 border border-[#16A34A]/30"
-              : "bg-[#DC4545]/20 text-red-400 border border-[#DC4545]/40"
+              ? "bg-[#16A34A]/20 text-[#16A34A] border-[#16A34A]/40"
+              : "bg-crimson/20 text-crimson border-crimson/40"
           }`}
         >
           {isOnline ? <Wifi className="w-3.5 h-3.5" /> : <WifiOff className="w-3.5 h-3.5" />}
-          <span>{isOnline ? "Online" : "Offline (Blocked)"}</span>
+          <span>{isOnline ? "NET: ONLINE" : "NET: OFFLINE (BLOCKED)"}</span>
         </div>
 
         <div className="flex items-center gap-2 font-mono text-[11px]">
-          <span className="px-2 py-0.5 rounded bg-[#16A34A]/15 text-emerald-400">
+          <span className="px-2 py-0.5 bg-[#16A34A]/20 text-[#16A34A] border border-[#16A34A]/30 font-bold">
             IN: {sessionStats.admitted}
           </span>
-          <span className="px-2 py-0.5 rounded bg-[#DC4545]/15 text-red-400">
+          <span className="px-2 py-0.5 bg-crimson/20 text-crimson border border-crimson/30 font-bold">
             DENY: {sessionStats.rejected}
           </span>
         </div>
       </div>
 
       {/* Gate Selector */}
-      <div className="flex items-center gap-2 bg-slate-900/90 border border-white/10 rounded-[10px] px-3 py-2">
-        <DoorOpen className="w-4 h-4 text-[#36C8E8] shrink-0" />
-        <label htmlFor="gate-input" className="text-xs text-slate-400 shrink-0">
-          Gate:
+      <div className="flex items-center gap-2 bg-carbon border border-white/15 px-3 py-2 font-mono text-xs">
+        <DoorOpen className="w-4 h-4 text-crimson shrink-0" />
+        <label htmlFor="gate-input" className="text-cream/50 shrink-0 uppercase text-[10px]">
+          GATE:
         </label>
         <input
           id="gate-input"
           type="text"
           value={gateName}
           onChange={(e) => setGateName(e.target.value)}
-          className="flex-1 bg-transparent text-xs font-semibold text-white focus:outline-none"
+          className="flex-1 bg-transparent text-xs font-bold text-cream focus:outline-none uppercase"
           placeholder="Main Gate"
         />
       </div>
 
       {/* Camera Viewfinder */}
-      <div className="relative aspect-square w-full rounded-[20px] overflow-hidden border border-white/15 bg-black flex items-center justify-center">
+      <div className="relative aspect-square w-full border-2 border-white/20 bg-black flex items-center justify-center overflow-hidden">
         <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
 
         {isScanning && (
           <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-            <div className="w-60 h-60 border-2 border-[#36C8E8]/80 rounded-2xl relative shadow-[0_0_40px_rgba(54,200,232,0.2)]">
-              <div className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-[#36C8E8] -mt-1 -ml-1 rounded-tl" />
-              <div className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-[#36C8E8] -mt-1 -mr-1 rounded-tr" />
-              <div className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-[#36C8E8] -mb-1 -ml-1 rounded-bl" />
-              <div className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-[#36C8E8] -mb-1 -mr-1 rounded-br" />
-              <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-[#36C8E8] to-transparent top-1/2" />
+            <div className="w-64 h-64 border border-crimson/60 relative">
+              <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-crimson -mt-1 -ml-1" />
+              <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-crimson -mt-1 -mr-1" />
+              <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-crimson -mb-1 -ml-1" />
+              <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-crimson -mb-1 -mr-1" />
+              <div className="absolute inset-x-0 h-0.5 bg-crimson top-1/2 shadow-[0_0_10px_#D72638]" />
             </div>
           </div>
         )}
 
         {!isScanning && (
           <div className="text-center p-6 flex flex-col items-center gap-3">
-            <div className="w-16 h-16 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center text-slate-400">
+            <div className="w-16 h-16 bg-carbon border border-white/15 flex items-center justify-center text-cream/40">
               <CameraOff className="w-8 h-8" />
             </div>
-            <p className="text-sm text-slate-300 font-medium">
-              {scannerState === "CAMERA_ERROR" ? "Camera Unavailable" : "Scanner Paused"}
+            <p className="font-mono text-xs text-cream/70 uppercase">
+              {scannerState === "CAMERA_ERROR" ? "Camera Unavailable" : "Scanner Idle"}
             </p>
-            {cameraError && <p className="text-xs text-red-400 max-w-xs">{cameraError}</p>}
+            {cameraError && <p className="font-mono text-[11px] text-crimson max-w-xs">{cameraError}</p>}
           </div>
         )}
 
         {scannerState === "VERIFYING" && (
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center flex-col gap-2 text-white">
-            <RefreshCw className="w-8 h-8 animate-spin text-[#36C8E8]" />
-            <span className="text-xs font-semibold uppercase tracking-wider">
-              Verifying Credential...
+          <div className="absolute inset-0 bg-pitch/80 backdrop-blur-sm flex items-center justify-center flex-col gap-2 text-cream">
+            <RefreshCw className="w-8 h-8 animate-spin text-crimson" />
+            <span className="font-mono text-xs font-bold uppercase tracking-widest">
+              ATOMIC VERIFICATION...
             </span>
           </div>
         )}
@@ -360,18 +360,18 @@ export function QrScanner({ eventId }: { eventId: string }) {
         {!isScanning ? (
           <button
             onClick={startScanner}
-            className="flex-1 py-3 px-4 rounded-[10px] bg-[#635BFF] hover:bg-[#5249F5] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#635BFF]/30 transition-all"
+            className="flex-1 py-3 px-4 bg-crimson hover:bg-crimson/90 text-white font-mono font-bold text-xs uppercase flex items-center justify-center gap-2 shadow-brutal transition-all"
           >
             <Camera className="w-4 h-4" />
-            <span>Start Camera</span>
+            <span>START VIEWFINDER</span>
           </button>
         ) : (
           <button
             onClick={stopScanner}
-            className="flex-1 py-3 px-4 rounded-[10px] bg-[#DC4545] hover:bg-red-700 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all"
+            className="flex-1 py-3 px-4 bg-carbon hover:bg-black text-white font-mono font-bold text-xs uppercase border border-white/20 flex items-center justify-center gap-2 transition-all"
           >
             <CameraOff className="w-4 h-4" />
-            <span>Stop Camera</span>
+            <span>HALT SCANNER</span>
           </button>
         )}
 
@@ -379,10 +379,10 @@ export function QrScanner({ eventId }: { eventId: string }) {
           <button
             onClick={toggleTorch}
             aria-label="Toggle flashlight"
-            className={`p-3 rounded-[10px] border transition-colors ${
+            className={`p-3 border font-mono text-xs transition-colors ${
               torchOn
-                ? "bg-[#EAAA24]/20 border-[#EAAA24] text-[#EAAA24]"
-                : "bg-slate-900 border-white/10 text-slate-300"
+                ? "bg-cream text-pitch border-cream"
+                : "bg-carbon border-white/20 text-cream"
             }`}
           >
             <Flashlight className="w-4 h-4" />
@@ -399,7 +399,7 @@ export function QrScanner({ eventId }: { eventId: string }) {
               }
             }}
             aria-label="Select camera"
-            className="px-3 py-3 rounded-[10px] bg-slate-900 border border-white/10 text-xs text-white max-w-[130px]"
+            className="px-3 py-3 bg-carbon border border-white/20 font-mono text-[11px] text-cream max-w-[130px] uppercase focus:outline-none"
           >
             {cameras.map((cam, idx) => (
               <option key={cam.deviceId} value={cam.deviceId}>
@@ -415,54 +415,54 @@ export function QrScanner({ eventId }: { eventId: string }) {
         <div
           role="status"
           aria-live="assertive"
-          className={`p-4 rounded-[16px] border-2 flex items-start gap-3 transition-all ${
+          className={`p-4 border-2 flex items-start gap-3 transition-all ${
             lastScanResult.state === "SUCCESS"
-              ? "bg-[#16A34A]/20 border-[#16A34A] text-white"
+              ? "bg-[#16A34A]/15 border-[#16A34A] text-white"
               : lastScanResult.state === "DUPLICATE"
-              ? "bg-[#EAAA24]/20 border-[#EAAA24] text-amber-100"
-              : "bg-[#DC4545]/20 border-[#DC4545] text-red-100"
+              ? "bg-amber-500/15 border-amber-500 text-amber-100"
+              : "bg-crimson/15 border-crimson text-red-100"
           }`}
         >
           {lastScanResult.state === "SUCCESS" ? (
-            <CheckCircle2 className="w-7 h-7 text-[#16A34A] shrink-0" />
+            <CheckCircle2 className="w-6 h-6 text-[#16A34A] shrink-0 mt-0.5" />
           ) : lastScanResult.state === "DUPLICATE" ? (
-            <AlertTriangle className="w-7 h-7 text-[#EAAA24] shrink-0" />
+            <AlertTriangle className="w-6 h-6 text-amber-500 shrink-0 mt-0.5" />
           ) : (
-            <XCircle className="w-7 h-7 text-[#DC4545] shrink-0" />
+            <XCircle className="w-6 h-6 text-crimson shrink-0 mt-0.5" />
           )}
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
-              <span className="font-display font-bold text-base">{lastScanResult.title}</span>
-              <span className="font-mono text-[11px] opacity-80">{lastScanResult.timestamp}</span>
+              <span className="font-display font-black text-sm uppercase">{lastScanResult.title}</span>
+              <span className="font-mono text-[10px] opacity-75">{lastScanResult.timestamp}</span>
             </div>
             {lastScanResult.attendeeName && (
-              <div className="font-bold text-lg text-white mt-0.5 truncate">
+              <div className="font-display font-bold text-base text-cream mt-0.5 truncate uppercase">
                 {lastScanResult.attendeeName}
               </div>
             )}
-            <p className="text-xs opacity-90 mt-1">{lastScanResult.detail}</p>
+            <p className="font-mono text-xs opacity-90 mt-1">{lastScanResult.detail}</p>
           </div>
         </div>
       )}
 
       {/* Manual Token Fallback */}
-      <form onSubmit={handleManualSubmit} className="flex items-center gap-2 pt-2 border-t border-white/10">
+      <form onSubmit={handleManualSubmit} className="flex items-center gap-2 pt-3 border-t border-white/10">
         <div className="relative flex-1">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-3.5 h-3.5 text-cream/40 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={manualCode}
             onChange={(e) => setManualCode(e.target.value)}
             placeholder="Manual ef:v1:... token entry"
-            className="w-full pl-9 pr-3 py-2 rounded-[10px] bg-slate-900 border border-white/10 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#635BFF]"
+            className="w-full pl-9 pr-3 py-2 bg-carbon border border-white/15 text-xs font-mono text-cream placeholder-cream/30 focus:outline-none focus:border-crimson"
           />
         </div>
         <button
           type="submit"
-          className="px-3.5 py-2 rounded-[10px] bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white"
+          className="px-4 py-2 bg-sand text-pitch hover:bg-cream text-xs font-mono font-bold uppercase transition-colors"
         >
-          Verify
+          VERIFY
         </button>
       </form>
     </div>

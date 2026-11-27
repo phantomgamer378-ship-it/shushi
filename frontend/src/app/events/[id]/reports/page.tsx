@@ -76,77 +76,89 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      {/* Editorial Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-pitch/10 dark:border-white/10">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Attendance Analytics & Reports
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2 h-2 bg-crimson inline-block" />
+            <span className="font-mono text-[11px] font-bold tracking-widest uppercase text-pitch/60 dark:text-cream/60">
+              04 // METRICS & AUDIT EXPORT
+            </span>
+          </div>
+          <h1 className="font-display text-3xl font-black tracking-tight text-pitch dark:text-cream uppercase">
+            Gate Analytics & Reports
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Real-time gate throughput metrics computed directly from PostgreSQL admission records.
+          <p className="font-mono text-xs text-pitch/60 dark:text-cream/60 mt-1">
+            Real-time throughput metrics derived directly from PostgreSQL check-in transactions.
           </p>
         </div>
         <Button size="sm" onClick={downloadAttendanceReport} disabled={checkins.length === 0}>
           <Download className="w-4 h-4" />
-          <span>Download CSV Report</span>
+          <span>EXPORT CSV AUDIT</span>
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
-          label="Total Eligible"
+          label="01 // REGISTERED PASSES"
           value={stats?.total_registrations ?? 0}
-          icon={<Users className="w-4 h-4" />}
+          icon={<Users className="w-4 h-4 text-crimson" />}
           loading={loading}
         />
         <MetricCard
-          label="Successful Check-Ins"
+          label="02 // ADMITTED (IN)"
           value={stats?.total_admitted ?? 0}
-          icon={<CheckCircle2 className="w-4 h-4" />}
+          icon={<CheckCircle2 className="w-4 h-4 text-[#16A34A]" />}
           loading={loading}
         />
         <MetricCard
-          label="Remaining"
+          label="03 // REMAINING (OUT)"
           value={stats?.pending_admission ?? 0}
-          icon={<Clock className="w-4 h-4" />}
+          icon={<Clock className="w-4 h-4 text-pitch/60 dark:text-cream/60" />}
           loading={loading}
         />
         <MetricCard
-          label="Attendance %"
+          label="04 // ATTENDANCE RATE"
           value={`${stats?.admission_rate_percent ?? 0}%`}
-          icon={<TrendingUp className="w-4 h-4" />}
-          progressPercent={stats?.admission_rate_percent ?? 0}
+          icon={<TrendingUp className="w-4 h-4 text-crimson" />}
           loading={loading}
         />
       </div>
 
-      <div className="glass-card p-6 rounded-[16px]">
-        <h3 className="font-display text-base font-bold text-slate-900 dark:text-white mb-4">
-          Check-Ins by Entry Gate
-        </h3>
+      <div className="editorial-card p-6">
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-pitch/10 dark:border-white/10">
+          <h3 className="font-display text-base font-black uppercase text-pitch dark:text-cream">
+            Check-Ins by Gate Location
+          </h3>
+          <span className="font-mono text-xs text-pitch/60 dark:text-cream/60">
+            {Object.keys(gateCounts).length} ACTIVE GATES
+          </span>
+        </div>
+
         {Object.keys(gateCounts).length === 0 ? (
-          <p className="text-xs text-slate-500 py-6 text-center">
+          <p className="font-mono text-xs text-pitch/50 dark:text-cream/50 py-8 text-center uppercase">
             No gate admission activity recorded yet.
           </p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {Object.entries(gateCounts).map(([gate, count]) => {
               const pct = stats?.total_admitted
                 ? Math.round((count / stats.total_admitted) * 100)
                 : 0;
               return (
-                <div key={gate} className="space-y-1.5">
+                <div key={gate} className="space-y-1.5 font-mono">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="flex items-center gap-2 font-medium text-slate-800 dark:text-slate-200">
-                      <DoorOpen className="w-3.5 h-3.5 text-[#635BFF]" />
+                    <span className="flex items-center gap-2 font-bold uppercase text-pitch dark:text-cream">
+                      <DoorOpen className="w-3.5 h-3.5 text-crimson" />
                       {gate}
                     </span>
-                    <span className="font-mono text-slate-500">
-                      {count} admitted ({pct}%)
+                    <span className="text-pitch/60 dark:text-cream/60 text-[11px]">
+                      {count} ADMITTED ({pct}%)
                     </span>
                   </div>
-                  <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                  <div className="w-full bg-sand dark:bg-carbon border border-pitch/15 dark:border-white/10 h-3 overflow-hidden">
                     <div
-                      className="bg-gradient-to-r from-[#635BFF] to-[#36C8E8] h-2 rounded-full"
+                      className="bg-crimson h-full transition-all"
                       style={{ width: `${pct}%` }}
                     />
                   </div>

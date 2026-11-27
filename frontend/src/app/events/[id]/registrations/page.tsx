@@ -82,7 +82,7 @@ export default function RegistrationsPage() {
       await apiClient(`events/${eventId}/tickets/${revokeTargetTicketId}/revoke`, {
         method: "POST",
       });
-      setToastMessage("Ticket revoked. Gate scanners will immediately reject this pass.");
+      setToastMessage("Ticket revoked. Gate scanners will reject this pass immediately.");
       setRevokeTargetTicketId(null);
       fetchData();
     } catch (err: any) {
@@ -128,31 +128,38 @@ export default function RegistrationsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      {/* Editorial Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-pitch/10 dark:border-white/10">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2 h-2 bg-crimson inline-block" />
+            <span className="font-mono text-[11px] font-bold tracking-widest uppercase text-pitch/60 dark:text-cream/60">
+              02 // ATTENDEES & ROSTER
+            </span>
+          </div>
+          <h1 className="font-display text-3xl font-black tracking-tight text-pitch dark:text-cream uppercase">
             Attendee Registrations
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Search attendees, inspect ticket status, export rosters, or revoke credentials.
+          <p className="font-mono text-xs text-pitch/60 dark:text-cream/60 mt-1">
+            Search verified attendees, inspect ticket cryptographic hashes, and manage gate credentials.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="secondary" size="sm" onClick={exportCsv} disabled={filteredRegistrations.length === 0}>
             <Download className="w-3.5 h-3.5" />
-            <span>Export CSV</span>
+            <span>EXPORT CSV</span>
           </Button>
           <Button variant="secondary" size="sm" onClick={fetchData}>
             <RefreshCw className="w-3.5 h-3.5" />
-            <span>Refresh</span>
+            <span>REFRESH</span>
           </Button>
         </div>
       </div>
 
       {toastMessage && (
-        <div className="p-3.5 rounded-[10px] bg-[#16A34A]/10 border border-[#16A34A]/25 text-[#16A34A] dark:text-emerald-300 text-xs flex items-center justify-between">
+        <div className="p-3 bg-pitch text-cream dark:bg-cream dark:text-pitch font-mono text-xs flex items-center justify-between border-l-4 border-crimson">
           <span>{toastMessage}</span>
-          <button onClick={() => setToastMessage(null)} className="font-bold">
+          <button onClick={() => setToastMessage(null)} className="font-bold hover:text-crimson">
             ✕
           </button>
         </div>
@@ -161,55 +168,55 @@ export default function RegistrationsPage() {
       {/* Search & Filter Controls */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-pitch/40 dark:text-cream/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search attendee name, email, or response ID..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-[10px] bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-[#635BFF]"
+            className="w-full pl-10 pr-4 py-2.5 bg-sand dark:bg-carbon border border-pitch/20 dark:border-white/15 text-sm text-pitch dark:text-cream font-mono focus:outline-none focus:border-crimson"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
           aria-label="Filter by registration status"
-          className="px-3.5 py-2.5 rounded-[10px] bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-[#635BFF]"
+          className="px-4 py-2.5 bg-sand dark:bg-carbon border border-pitch/20 dark:border-white/15 text-xs text-pitch dark:text-cream font-mono uppercase focus:outline-none focus:border-crimson"
         >
-          <option value="ALL">All Statuses</option>
-          <option value="CONFIRMED">Confirmed</option>
-          <option value="PENDING">Pending</option>
-          <option value="CANCELLED">Cancelled</option>
+          <option value="ALL">ALL STATUSES</option>
+          <option value="CONFIRMED">CONFIRMED</option>
+          <option value="PENDING">PENDING</option>
+          <option value="CANCELLED">CANCELLED</option>
         </select>
       </div>
 
       {loading ? (
-        <div className="glass-card p-8 rounded-[16px] space-y-3 animate-pulse">
+        <div className="border border-pitch/15 dark:border-white/10 p-8 space-y-3">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-12 bg-slate-200 dark:bg-slate-800 rounded-[10px]" />
+            <div key={i} className="h-12 bg-pitch/5 dark:bg-white/5 animate-pulse" />
           ))}
         </div>
       ) : filteredRegistrations.length === 0 ? (
         <EmptyState
-          title="No Matching Attendees"
-          description="Try adjusting your search query or status filter."
+          title="NO ATTENDEES FOUND"
+          description="No attendee records match the current filter query."
         />
       ) : (
         <>
           {/* Desktop Table */}
-          <div className="hidden md:block glass-card rounded-[16px] overflow-hidden">
+          <div className="hidden md:block border border-pitch/20 dark:border-white/15 bg-cream dark:bg-pitch overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-white/5 uppercase tracking-wider font-semibold">
+                <thead className="bg-sand dark:bg-carbon text-pitch/70 dark:text-cream/70 border-b border-pitch/15 dark:border-white/10 font-mono text-[10px] uppercase tracking-wider">
                   <tr>
-                    <th className="px-5 py-3.5">Attendee</th>
-                    <th className="px-5 py-3.5">Registration</th>
-                    <th className="px-5 py-3.5">Ticket Status</th>
-                    <th className="px-5 py-3.5">Registered At</th>
-                    <th className="px-5 py-3.5 text-right">Actions</th>
+                    <th className="px-5 py-3.5">ATTENDEE</th>
+                    <th className="px-5 py-3.5">STATUS</th>
+                    <th className="px-5 py-3.5">TICKET CREDENTIAL</th>
+                    <th className="px-5 py-3.5">REGISTERED AT</th>
+                    <th className="px-5 py-3.5 text-right">ACTIONS</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-white/5">
+                <tbody className="divide-y divide-pitch/10 dark:divide-white/10 font-mono">
                   {filteredRegistrations.map((reg) => {
                     const ticket = ticketByRegId.get(reg.id);
                     const isRevoked = ticket?.status === "REVOKED";
@@ -218,14 +225,14 @@ export default function RegistrationsPage() {
                       <tr
                         key={reg.id}
                         onClick={() => setSelectedReg(reg)}
-                        className="hover:bg-slate-50 dark:hover:bg-white/[0.02] cursor-pointer transition-colors"
+                        className="hover:bg-sand/60 dark:hover:bg-carbon/60 cursor-pointer transition-colors"
                       >
                         <td className="px-5 py-4">
-                          <div className="font-semibold text-slate-900 dark:text-white text-sm">
+                          <div className="font-display font-bold text-pitch dark:text-cream text-sm">
                             {reg.attendee_name}
                           </div>
-                          <div className="text-slate-500 dark:text-slate-400 text-xs flex items-center gap-1.5 mt-0.5">
-                            <Mail className="w-3 h-3" />
+                          <div className="text-pitch/60 dark:text-cream/60 text-xs flex items-center gap-1.5 mt-0.5">
+                            <Mail className="w-3 h-3 text-crimson" />
                             <span>{reg.attendee_email}</span>
                           </div>
                         </td>
@@ -236,12 +243,14 @@ export default function RegistrationsPage() {
                         </td>
                         <td className="px-5 py-4">
                           {ticket ? (
-                            <Badge variant={isRevoked ? "danger" : "brand"}>{ticket.status}</Badge>
+                            <Badge variant={isRevoked ? "crimson" : "neutral"}>
+                              {ticket.status}
+                            </Badge>
                           ) : (
-                            <span className="text-slate-400">None</span>
+                            <span className="text-pitch/40 dark:text-cream/40">NONE</span>
                           )}
                         </td>
-                        <td className="px-5 py-4 text-slate-500 dark:text-slate-400">
+                        <td className="px-5 py-4 text-pitch/60 dark:text-cream/60 text-[11px]">
                           {new Date(reg.registered_at).toLocaleString()}
                         </td>
                         <td
@@ -256,7 +265,7 @@ export default function RegistrationsPage() {
                                 disabled={actionLoading === ticket.id || isRevoked}
                                 onClick={() => handleResend(ticket.id)}
                               >
-                                Resend
+                                RESEND
                               </Button>
                               {!isRevoked && (
                                 <Button
@@ -265,7 +274,7 @@ export default function RegistrationsPage() {
                                   disabled={actionLoading === ticket.id}
                                   onClick={() => setRevokeTargetTicketId(ticket.id)}
                                 >
-                                  Revoke
+                                  REVOKE
                                 </Button>
                               )}
                             </div>
@@ -288,21 +297,21 @@ export default function RegistrationsPage() {
                 <div
                   key={reg.id}
                   onClick={() => setSelectedReg(reg)}
-                  className="glass-card p-4 rounded-[16px] space-y-3"
+                  className="editorial-card p-4 space-y-3"
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <div className="font-semibold text-slate-900 dark:text-white text-sm">
+                      <div className="font-display font-bold text-pitch dark:text-cream text-sm">
                         {reg.attendee_name}
                       </div>
-                      <div className="text-xs text-slate-500">{reg.attendee_email}</div>
+                      <div className="font-mono text-xs text-pitch/60 dark:text-cream/60">{reg.attendee_email}</div>
                     </div>
-                    <Badge variant={isRevoked ? "danger" : "brand"}>
+                    <Badge variant={isRevoked ? "crimson" : "neutral"}>
                       {ticket?.status || reg.status}
                     </Badge>
                   </div>
                   {ticket && (
-                    <div className="flex items-center gap-2 pt-2 border-t border-slate-200 dark:border-white/5">
+                    <div className="flex items-center gap-2 pt-2 border-t border-pitch/10 dark:border-white/10">
                       <Button
                         size="sm"
                         variant="secondary"
@@ -313,7 +322,7 @@ export default function RegistrationsPage() {
                           handleResend(ticket.id);
                         }}
                       >
-                        Resend Email
+                        RESEND
                       </Button>
                       {!isRevoked && (
                         <Button
@@ -325,7 +334,7 @@ export default function RegistrationsPage() {
                             setRevokeTargetTicketId(ticket.id);
                           }}
                         >
-                          Revoke
+                          REVOKE
                         </Button>
                       )}
                     </div>
@@ -339,55 +348,55 @@ export default function RegistrationsPage() {
 
       {/* Attendee Detail Drawer */}
       {selectedReg && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-white dark:bg-[#10172A] border-l border-slate-200 dark:border-white/10 h-full p-6 flex flex-col justify-between shadow-2xl overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-cream dark:bg-pitch border-l border-pitch/20 dark:border-white/20 h-full p-6 flex flex-col justify-between shadow-2xl overflow-y-auto">
             <div className="space-y-6">
-              <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-4">
+              <div className="flex items-center justify-between border-b border-pitch/10 dark:border-white/10 pb-4">
                 <div className="flex items-center gap-2.5">
-                  <User className="w-5 h-5 text-[#635BFF]" />
-                  <h3 className="font-display text-lg font-bold text-slate-900 dark:text-white">
-                    Attendee Profile
+                  <User className="w-5 h-5 text-crimson" />
+                  <h3 className="font-display text-lg font-black tracking-tight text-pitch dark:text-cream uppercase">
+                    ATTENDEE PROFILE
                   </h3>
                 </div>
                 <button
                   onClick={() => setSelectedReg(null)}
                   aria-label="Close drawer"
-                  className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10"
+                  className="p-1 hover:text-crimson transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <div className="space-y-4 text-xs">
+              <div className="space-y-4 font-mono text-xs">
                 <div>
-                  <div className="text-slate-500 uppercase font-semibold">Full Name</div>
-                  <div className="text-base font-bold text-slate-900 dark:text-white mt-0.5">
+                  <div className="text-[10px] text-pitch/50 dark:text-cream/50 uppercase tracking-wider">FULL NAME</div>
+                  <div className="font-display text-lg font-bold text-pitch dark:text-cream mt-0.5">
                     {selectedReg.attendee_name}
                   </div>
                 </div>
                 <div>
-                  <div className="text-slate-500 uppercase font-semibold">Email</div>
-                  <div className="text-sm text-slate-700 dark:text-slate-300 mt-0.5">
+                  <div className="text-[10px] text-pitch/50 dark:text-cream/50 uppercase tracking-wider">EMAIL</div>
+                  <div className="text-xs text-pitch dark:text-cream mt-0.5">
                     {selectedReg.attendee_email}
                   </div>
                 </div>
                 <div>
-                  <div className="text-slate-500 uppercase font-semibold">Form Response ID</div>
-                  <div className="font-mono text-slate-600 dark:text-slate-400 mt-0.5">
+                  <div className="text-[10px] text-pitch/50 dark:text-cream/50 uppercase tracking-wider">FORM RESPONSE ID</div>
+                  <div className="text-xs text-pitch/70 dark:text-cream/70 mt-0.5">
                     {selectedReg.external_form_response_id || selectedReg.source_response_id}
                   </div>
                 </div>
 
                 {ticketByRegId.get(selectedReg.id) && (
-                  <div className="p-4 rounded-[12px] bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 space-y-2">
-                    <div className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
-                      <TicketIcon className="w-4 h-4 text-[#635BFF]" />
-                      <span>Cryptographic Credential</span>
+                  <div className="p-4 bg-sand dark:bg-carbon border border-pitch/15 dark:border-white/10 space-y-2">
+                    <div className="flex items-center gap-2 font-display font-bold text-pitch dark:text-cream text-xs uppercase">
+                      <TicketIcon className="w-4 h-4 text-crimson" />
+                      <span>CRYPTOGRAPHIC CREDENTIAL</span>
                     </div>
-                    <div className="text-[11px] text-slate-500">
-                      Token Hash (SHA-256):
+                    <div className="text-[10px] text-pitch/50 dark:text-cream/50">
+                      TOKEN SHA-256 HASH:
                     </div>
-                    <div className="font-mono text-[10px] break-all text-slate-600 dark:text-slate-400">
+                    <div className="font-mono text-[10px] break-all text-pitch/80 dark:text-cream/80 bg-pitch/5 dark:bg-white/5 p-2">
                       {ticketByRegId.get(selectedReg.id)?.token_hash}
                     </div>
                   </div>
@@ -396,7 +405,7 @@ export default function RegistrationsPage() {
             </div>
 
             <Button variant="secondary" onClick={() => setSelectedReg(null)}>
-              Close
+              CLOSE
             </Button>
           </div>
         </div>

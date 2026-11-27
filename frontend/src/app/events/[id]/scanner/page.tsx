@@ -9,11 +9,19 @@ export default function EventScannerPage() {
   const eventId = params.id as string;
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-white">Gate Admission Scanner</h1>
-        <p className="text-xs text-slate-400 mt-1">
-          Scan attendee QR codes at event entry gates. Tokens are hashed on arrival and checked atomically against the database.
+    <div className="max-w-2xl mx-auto space-y-6">
+      <div className="pb-4 border-b border-pitch/10 dark:border-white/10">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="w-2 h-2 bg-crimson inline-block" />
+          <span className="font-mono text-[11px] font-bold tracking-widest uppercase text-pitch/60 dark:text-cream/60">
+            01 // ADMISSION SCANNER
+          </span>
+        </div>
+        <h1 className="font-display text-3xl font-black tracking-tight text-pitch dark:text-cream uppercase">
+          Gate Admission Viewfinder
+        </h1>
+        <p className="font-mono text-xs text-pitch/60 dark:text-cream/60 mt-1">
+          Zero-PII QR pass scanner. Validates tokens atomically via PostgreSQL row locks with instantaneous cryptographic hashing.
         </p>
       </div>
 

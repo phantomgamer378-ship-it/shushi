@@ -4,19 +4,8 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { apiClient } from "@/lib/api";
-import { Badge, Button, MetricCard } from "@/components/ui/Primitives";
-import {
-  Users,
-  CheckCircle2,
-  Clock,
-  QrCode,
-  Link2,
-  Calendar,
-  MapPin,
-  ArrowRight,
-  TrendingUp,
-  DoorOpen,
-} from "lucide-react";
+import { Button, MetricCard } from "@/components/ui/Primitives";
+import { QrCode, ArrowRight, DoorOpen } from "lucide-react";
 
 interface EventStats {
   event_id: string;
@@ -78,37 +67,29 @@ export default function EventOverviewPage() {
   }, [eventId]);
 
   return (
-    <div className="space-y-8">
-      {/* Event Header Banner */}
-      <div className="glass-card p-6 rounded-[20px] flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <div className="space-y-8 text-[#F4F0EA]">
+      {/* Editorial Header Banner */}
+      <div className="editorial-card p-6 sm:p-8 bg-[#121214] border border-[#27272A] flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div>
-          <div className="flex items-center gap-2.5 mb-2">
-            <Badge variant={event?.status === "ACTIVE" ? "success" : "brand"}>
-              {event?.status || "LOADING"}
-            </Badge>
-            <span className="font-mono text-xs text-slate-500 dark:text-slate-400">
-              {event?.slug}
+          <div className="flex items-center gap-3 font-mono text-[11px] mb-2 uppercase tracking-widest">
+            <span className="px-2 py-0.5 bg-[#D72638] text-white font-bold">
+              {event?.status || "ACTIVE"}
             </span>
+            <span className="text-slate-400">SLUG // {event?.slug}</span>
           </div>
-          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-            {event?.title || "Event Dashboard"}
+          <h1 className="font-display text-4xl sm:text-5xl font-black uppercase tracking-tight text-white">
+            {event?.title || "Shushi"}
           </h1>
-          <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 dark:text-slate-400 mt-2">
-            <div className="flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-[#635BFF] dark:text-[#36C8E8]" />
-              <span>{event?.venue_name}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-[#635BFF] dark:text-[#36C8E8]" />
-              <span>
-                {event?.start_time ? new Date(event.start_time).toLocaleString() : "—"}
-              </span>
-            </div>
+          <div className="font-mono text-xs text-slate-400 mt-2 flex flex-wrap gap-4">
+            <span>VENUE // {event?.venue_name}</span>
+            <span>
+              DATE // {event?.start_time ? new Date(event.start_time).toLocaleDateString() : "—"}
+            </span>
           </div>
         </div>
 
         <Link href={`/events/${eventId}/scanner`}>
-          <Button size="md">
+          <Button variant="crimson" size="lg">
             <QrCode className="w-4 h-4" />
             <span>Launch Gate Scanner</span>
           </Button>
@@ -116,77 +97,69 @@ export default function EventOverviewPage() {
       </div>
 
       {/* Real-time KPI Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
+          prefix="01 //"
           label="Total Registrations"
           value={stats?.total_registrations ?? 0}
-          icon={<Users className="w-4 h-4" />}
           context={
-            stats?.max_capacity
-              ? `Capacity limit: ${stats.max_capacity}`
-              : "Confirmed RSVP attendees"
+            stats?.max_capacity ? `Limit: ${stats.max_capacity} attendees` : "Confirmed RSVP records"
           }
           loading={loading}
         />
         <MetricCard
+          prefix="02 //"
           label="Admitted At Gate"
           value={stats?.total_admitted ?? 0}
-          icon={<CheckCircle2 className="w-4 h-4" />}
-          context="Atomic check-ins verified"
+          context="Verified check-ins"
           loading={loading}
         />
         <MetricCard
+          prefix="03 //"
           label="Pending Arrival"
           value={stats?.pending_admission ?? 0}
-          icon={<Clock className="w-4 h-4" />}
-          context="Active tickets awaiting entry"
+          context="Awaiting entry scan"
           loading={loading}
         />
         <MetricCard
+          prefix="04 //"
           label="Admission Rate"
           value={`${stats?.admission_rate_percent ?? 0}%`}
-          icon={<TrendingUp className="w-4 h-4" />}
-          progressPercent={stats?.admission_rate_percent ?? 0}
+          context="Capacity throughput"
           loading={loading}
         />
       </div>
 
-      {/* Recent Activity & Quick Actions */}
+      {/* Gate Stream & Quick Links */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 glass-card p-6 rounded-[16px]">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-display text-base font-bold text-slate-900 dark:text-white">
-              Recent Gate Check-ins
-            </h3>
+        <div className="lg:col-span-2 editorial-card p-6 bg-[#121214] border border-[#27272A]">
+          <div className="flex items-center justify-between border-b border-[#27272A] pb-3 mb-4">
+            <div className="font-mono text-xs uppercase tracking-wider text-white font-bold">
+              Recent Gate Admissions
+            </div>
             <Link
               href={`/events/${eventId}/attendance`}
-              className="text-xs font-semibold text-[#635BFF] dark:text-[#36C8E8] hover:underline flex items-center gap-1"
+              className="font-mono text-[11px] uppercase text-[#D72638] hover:underline flex items-center gap-1 font-bold"
             >
-              View Live Stream <ArrowRight className="w-3.5 h-3.5" />
+              Live Feed <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
+
           {recentCheckins.length === 0 ? (
-            <div className="py-10 text-center text-xs text-slate-500 dark:text-slate-400">
-              No gate check-ins recorded yet. Launch the QR scanner when doors open.
+            <div className="py-12 text-center font-mono text-xs text-slate-500">
+              No admissions logged yet. Launch the scanner to begin admitting guests.
             </div>
           ) : (
-            <div className="divide-y divide-slate-200 dark:divide-white/5">
+            <div className="divide-y divide-[#27272A]">
               {recentCheckins.map((c) => (
-                <div key={c.id} className="py-3 flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-lg bg-[#16A34A]/10 text-[#16A34A] flex items-center justify-center">
-                      <CheckCircle2 className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-slate-900 dark:text-white">
-                        {c.attendee_name}
-                      </div>
-                      <div className="text-slate-500 flex items-center gap-1">
-                        <DoorOpen className="w-3 h-3" /> {c.gate_name}
-                      </div>
+                <div key={c.id} className="py-3 flex items-center justify-between font-mono text-xs">
+                  <div>
+                    <div className="font-bold text-white">{c.attendee_name}</div>
+                    <div className="text-slate-400 text-[11px] flex items-center gap-1 mt-0.5">
+                      <DoorOpen className="w-3 h-3 text-[#D72638]" /> {c.gate_name}
                     </div>
                   </div>
-                  <span className="font-mono text-slate-500">
+                  <span className="text-slate-500 text-[11px]">
                     {new Date(c.checked_in_at).toLocaleTimeString()}
                   </span>
                 </div>
@@ -198,34 +171,37 @@ export default function EventOverviewPage() {
         <div className="space-y-4">
           <Link
             href={`/events/${eventId}/registrations`}
-            className="block glass-card p-5 rounded-[16px] group"
+            className="block editorial-card p-5 bg-[#121214] border border-[#27272A] hover:border-[#D72638] group transition-all"
           >
-            <h3 className="font-display text-sm font-bold text-slate-900 dark:text-white mb-1">
-              Attendee Roster & Passes
+            <div className="font-mono text-[10px] uppercase text-[#D72638] font-bold mb-1">
+              01 // ROSTER
+            </div>
+            <h3 className="font-display text-base font-bold uppercase text-white mb-1">
+              Guest Management
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
-              Search attendees, export CSVs, reissue emails, or revoke tickets.
+            <p className="font-mono text-xs text-slate-400 mb-3">
+              Search attendees, export CSV data, or revoke admission passes.
             </p>
-            <span className="text-xs font-semibold text-[#635BFF] dark:text-[#36C8E8] flex items-center gap-1">
-              Manage Attendees <ArrowRight className="w-3.5 h-3.5" />
+            <span className="font-mono text-xs font-bold uppercase text-[#D72638] flex items-center gap-1">
+              Open Roster <ArrowRight className="w-3.5 h-3.5" />
             </span>
           </Link>
 
           <Link
             href={`/events/${eventId}/settings`}
-            className="block glass-card p-5 rounded-[16px] group"
+            className="block editorial-card p-5 bg-[#121214] border border-[#27272A] hover:border-[#D72638] group transition-all"
           >
-            <div className="flex items-center gap-2 text-[#635BFF] dark:text-[#36C8E8] mb-1">
-              <Link2 className="w-4 h-4" />
-              <h3 className="font-display text-sm font-bold text-slate-900 dark:text-white">
-                Google Forms Webhook
-              </h3>
+            <div className="font-mono text-[10px] uppercase text-[#D72638] font-bold mb-1">
+              02 // INGESTION
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
-              Copy HMAC endpoint URL & Apps Script trigger snippet.
+            <h3 className="font-display text-base font-bold uppercase text-white mb-1">
+              Google Forms Webhook
+            </h3>
+            <p className="font-mono text-xs text-slate-400 mb-3">
+              View your HMAC signing secret and copy the Apps Script forwarder.
             </p>
-            <span className="text-xs font-semibold text-[#635BFF] dark:text-[#36C8E8] flex items-center gap-1">
-              Configure Integration <ArrowRight className="w-3.5 h-3.5" />
+            <span className="font-mono text-xs font-bold uppercase text-[#D72638] flex items-center gap-1">
+              Configure Webhook <ArrowRight className="w-3.5 h-3.5" />
             </span>
           </Link>
         </div>

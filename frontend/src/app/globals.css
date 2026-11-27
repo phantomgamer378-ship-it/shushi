@@ -3,71 +3,49 @@
 @tailwind utilities;
 
 :root {
-  --bg-page: #f4f6fb;
-  --bg-surface: #ffffff;
-  --bg-surface-muted: #f8fafc;
-  --text-primary: #10172a;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
-  --border-subtle: rgba(16, 23, 42, 0.08);
-  --glass-bg: rgba(255, 255, 255, 0.78);
-  --glass-border: rgba(16, 23, 42, 0.08);
+  --bg-page: #ede8df;
+  --bg-surface: #f4f0ea;
+  --text-main: #0a0a0c;
+  --text-muted: #52525b;
+  --border-color: #27272a;
+  --accent-red: #d72638;
 }
 
 .dark {
-  --bg-page: #0b1120;
-  --bg-surface: #111827;
-  --bg-surface-muted: #18233d;
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --glass-bg: rgba(17, 24, 39, 0.76);
-  --glass-border: rgba(255, 255, 255, 0.09);
+  --bg-page: #0a0a0c;
+  --bg-surface: #121214;
+  --text-main: #f4f0ea;
+  --text-muted: #a1a1aa;
+  --border-color: #27272a;
+  --accent-red: #d72638;
 }
 
 body {
-  color: var(--text-primary);
+  color: var(--text-main);
   background-color: var(--bg-page);
   font-feature-settings: "rlig" 1, "calt" 1;
-  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.dark body {
-  background: radial-gradient(circle at 50% 0%, #18233d 0%, #10172a 55%, #090d16 100%);
+/* Editorial Brutalist Cards */
+.editorial-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  transition: all 0.15s ease-in-out;
 }
 
-.glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
+.dark .editorial-card {
+  background-color: #121214;
+  border-color: #27272a;
 }
 
-.glass-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 0.2s ease;
-}
-
-.dark .glass-card {
-  background: rgba(17, 24, 39, 0.72);
-  backdrop-filter: blur(12px);
-}
-
-.glass-card:hover {
-  border-color: rgba(99, 91, 255, 0.35);
-}
-
-/* 3D Spatial Ticket Perspective */
-.perspective-1000 {
-  perspective: 1000px;
-}
-
-.preserve-3d {
-  transform-style: preserve-3d;
+/* Red Accent Ribbon Banner */
+.red-ribbon {
+  background-color: #d72638;
+  color: #ffffff;
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -77,6 +55,5 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
   }
 }

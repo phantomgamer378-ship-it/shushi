@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { QrCode, Calendar, LogOut, Sun, Moon, Menu, X } from "lucide-react";
+import { LogOut, Sun, Moon, Menu, X } from "lucide-react";
 
 export function Navbar({
   eventTitle,
@@ -58,63 +58,65 @@ export function Navbar({
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full glass-panel border-b border-slate-200 dark:border-white/10 px-4 sm:px-6 py-3 flex items-center justify-between">
-      <div className="flex items-center gap-3 sm:gap-5">
+    <header className="sticky top-0 z-40 w-full bg-[#0A0A0C] border-b border-[#27272A] px-4 sm:px-6 py-3 flex items-center justify-between text-white">
+      <div className="flex items-center gap-4">
         {eventId && onToggleMobileMenu && (
           <button
             onClick={onToggleMobileMenu}
             aria-label="Toggle navigation menu"
-            className="md:hidden p-2 rounded-[10px] text-slate-600 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-white/10 transition-colors"
+            className="md:hidden p-1.5 border border-white/20 text-white"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </button>
         )}
 
-        <Link
-          href="/events"
-          className="flex items-center gap-2.5 font-display font-bold text-lg tracking-tight text-slate-900 dark:text-white group"
-        >
-          <div className="w-8 h-8 rounded-[10px] bg-gradient-to-tr from-[#635BFF] to-[#36C8E8] flex items-center justify-center text-white shadow-lg shadow-[#635BFF]/25 group-hover:scale-105 transition-transform">
-            <QrCode className="w-4 h-4" />
+        <Link href="/events" className="flex items-center gap-3 group">
+          {/* Brutalist Logo Block */}
+          <div className="w-7 h-7 bg-white text-black font-mono font-black text-xs flex items-center justify-center border border-white">
+            SH
           </div>
-          <span>Shushi</span>
+          <span className="font-display font-black tracking-tight text-base uppercase">
+            Shushi
+          </span>
         </Link>
 
         {eventId && eventTitle && (
-          <div className="hidden sm:flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 pl-4 border-l border-slate-200 dark:border-white/10">
-            <Calendar className="w-4 h-4 text-[#635BFF] dark:text-[#36C8E8]" />
-            <span className="font-medium text-slate-800 dark:text-slate-200 truncate max-w-[220px]">
-              {eventTitle}
-            </span>
+          <div className="hidden sm:flex items-center gap-2 pl-4 border-l border-[#27272A] font-mono text-xs text-slate-400 uppercase tracking-wider">
+            <span className="w-2 h-2 rounded-full bg-[#D72638] animate-pulse" />
+            <span className="text-white font-bold">{eventTitle}</span>
           </div>
         )}
       </div>
 
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-4">
+        {/* Subtle Status Dots (matching reference image) */}
+        <div className="hidden md:flex items-center gap-2 font-mono text-[10px] uppercase text-slate-400">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#D72638]" title="Live Admission Gateway" />
+          <span className="w-2.5 h-2.5 rounded-full bg-blue-500" title="Supabase Mumbai Pooler" />
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" title="Operational Status" />
+          <span className="ml-1 tracking-widest text-[11px] text-slate-300">SYSTEM READY</span>
+        </div>
+
         <button
           onClick={toggleTheme}
           aria-label="Toggle color theme"
-          title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-          className="p-2 rounded-[10px] text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-white/10 transition-colors"
+          className="p-1.5 border border-white/20 hover:bg-white/10 text-slate-300"
         >
-          {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
         </button>
 
         {userEmail && (
-          <div className="flex items-center gap-2.5 pl-2 border-l border-slate-200 dark:border-white/10">
-            <div className="w-7 h-7 rounded-full bg-[#635BFF]/15 border border-[#635BFF]/30 flex items-center justify-center text-xs font-bold text-[#635BFF] dark:text-[#36C8E8]">
-              {userEmail.charAt(0).toUpperCase()}
-            </div>
-            <span className="text-xs text-slate-600 dark:text-slate-300 font-medium hidden md:inline">
+          <div className="flex items-center gap-3 pl-3 border-l border-[#27272A]">
+            <span className="font-mono text-xs text-slate-300 hidden md:inline">
               {userEmail}
             </span>
             <button
               onClick={handleLogout}
               aria-label="Log out"
               title="Log out"
-              className="text-slate-500 dark:text-slate-400 hover:text-[#DC4545] p-1.5 rounded-[10px] hover:bg-red-500/10 transition-colors"
+              className="p-1.5 border border-[#D72638] text-[#D72638] hover:bg-[#D72638] hover:text-white transition-colors"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-3.5 h-3.5" />
             </button>
           </div>
         )}

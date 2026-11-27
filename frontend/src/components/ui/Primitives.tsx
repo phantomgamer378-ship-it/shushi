@@ -4,16 +4,16 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { AlertTriangle, Inbox } from "lucide-react";
 
-// 1. Button
+// 1. Button (Editorial Brutalist: Sharp borders, stark black/crimson)
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "danger" | "ghost";
+  variant?: "primary" | "secondary" | "danger" | "ghost" | "crimson";
   size?: "sm" | "md" | "lg";
   loading?: boolean;
 }
 
 export function Button({
   children,
-  variant = "primary",
+  variant = "crimson",
   size = "md",
   loading = false,
   className,
@@ -21,27 +21,29 @@ export function Button({
   ...props
 }: ButtonProps) {
   const variants = {
+    crimson:
+      "bg-[#D72638] hover:bg-[#BF1E2F] text-white border border-[#D72638] shadow-sm uppercase tracking-wider font-mono",
     primary:
-      "bg-[#635BFF] hover:bg-[#5249F5] text-white shadow-lg shadow-[#635BFF]/25 border border-transparent",
+      "bg-[#0A0A0C] dark:bg-[#F4F0EA] text-[#F4F0EA] dark:text-[#0A0A0C] hover:opacity-90 border border-black dark:border-white uppercase tracking-wider font-mono",
     secondary:
-      "bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-white/10",
+      "bg-transparent hover:bg-black/5 dark:hover:bg-white/5 text-[#0A0A0C] dark:text-[#F4F0EA] border border-black/30 dark:border-white/20 uppercase tracking-wider font-mono",
     danger:
-      "bg-[#DC4545] hover:bg-red-700 text-white shadow-lg shadow-red-600/20 border border-transparent",
+      "bg-[#D72638] hover:bg-[#BF1E2F] text-white border border-[#D72638] uppercase tracking-wider font-mono",
     ghost:
-      "bg-transparent hover:bg-slate-100 dark:hover:bg-white/5 text-slate-600 dark:text-slate-300 border border-transparent",
+      "bg-transparent hover:bg-black/5 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 border-transparent",
   };
 
   const sizes = {
-    sm: "px-3 py-1.5 text-xs rounded-[10px]",
-    md: "px-4 py-2.5 text-sm rounded-[10px]",
-    lg: "px-5 py-3 text-base rounded-[10px]",
+    sm: "px-3 py-1.5 text-xs rounded-sm",
+    md: "px-4 py-2.5 text-xs rounded-sm",
+    lg: "px-5 py-3 text-sm rounded-sm",
   };
 
   return (
     <button
       disabled={disabled || loading}
       className={cn(
-        "inline-flex items-center justify-center gap-2 font-semibold transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus:ring-2 focus:ring-[#635BFF]/50",
+        "inline-flex items-center justify-center gap-2 font-bold transition-all duration-100 active:translate-y-0.5 disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus:ring-1 focus:ring-[#D72638]",
         variants[variant],
         sizes[size],
         className
@@ -49,33 +51,35 @@ export function Button({
       {...props}
     >
       {loading && (
-        <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+        <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
       )}
       {children}
     </button>
   );
 }
 
-// 2. Semantic Badge
+// 2. Semantic Badge (Editorial Mono Style)
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: "neutral" | "brand" | "success" | "warning" | "danger";
+  variant?: "neutral" | "crimson" | "success" | "warning";
   className?: string;
 }
 
 export function Badge({ children, variant = "neutral", className }: BadgeProps) {
   const variants = {
-    neutral: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-white/10",
-    brand: "bg-[#635BFF]/10 text-[#635BFF] dark:text-[#817BFF] border-[#635BFF]/25",
-    success: "bg-[#16A34A]/10 text-[#16A34A] dark:text-emerald-400 border-[#16A34A]/25",
-    warning: "bg-[#EAAA24]/15 text-amber-700 dark:text-amber-300 border-[#EAAA24]/30",
-    danger: "bg-[#DC4545]/10 text-[#DC4545] dark:text-red-400 border-[#DC4545]/25",
+    neutral:
+      "bg-black/5 dark:bg-white/5 text-slate-800 dark:text-slate-200 border-black/20 dark:border-white/20",
+    crimson: "bg-[#D72638] text-white border-[#D72638]",
+    success:
+      "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30",
+    warning:
+      "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30",
   };
 
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border",
+        "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm font-mono text-[10px] uppercase font-bold tracking-widest border",
         variants[variant],
         className
       )}
@@ -85,55 +89,46 @@ export function Badge({ children, variant = "neutral", className }: BadgeProps) 
   );
 }
 
-// 3. MetricCard with Skeleton support
+// 3. MetricCard (Minimalist Editorial Layout)
 interface MetricCardProps {
   label: string;
   value: string | number;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   context?: string;
   loading?: boolean;
-  progressPercent?: number;
+  prefix?: string;
 }
 
 export function MetricCard({
   label,
   value,
-  icon,
   context,
   loading = false,
-  progressPercent,
+  prefix = "01 //",
 }: MetricCardProps) {
   if (loading) {
     return (
-      <div className="glass-card p-5 rounded-[16px] animate-pulse space-y-3">
-        <div className="h-3 w-24 bg-slate-200 dark:bg-slate-800 rounded" />
-        <div className="h-8 w-16 bg-slate-200 dark:bg-slate-800 rounded" />
-        <div className="h-3 w-32 bg-slate-200 dark:bg-slate-800 rounded" />
+      <div className="editorial-card p-5 animate-pulse space-y-3">
+        <div className="h-3 w-24 bg-slate-300 dark:bg-slate-800" />
+        <div className="h-8 w-16 bg-slate-300 dark:bg-slate-800" />
       </div>
     );
   }
 
   return (
-    <div className="glass-card p-5 rounded-[16px] shadow-card-light dark:shadow-card-dark hover:-translate-y-0.5">
-      <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-2">
-        <span className="text-xs font-semibold uppercase tracking-wider">{label}</span>
-        <div className="p-2 rounded-lg bg-[#635BFF]/10 text-[#635BFF] dark:text-[#36C8E8]">
-          {icon}
-        </div>
+    <div className="editorial-card p-5 relative overflow-hidden">
+      <div className="flex items-center justify-between font-mono text-[11px] text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">
+        <span>
+          <strong className="text-[#D72638]">{prefix}</strong> {label}
+        </span>
       </div>
-      <div className="font-display text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+      <div className="font-display text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
         {value}
       </div>
       {context && (
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{context}</p>
-      )}
-      {typeof progressPercent === "number" && (
-        <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 mt-3 overflow-hidden">
-          <div
-            className="bg-gradient-to-r from-[#635BFF] to-[#36C8E8] h-1.5 rounded-full transition-all duration-500"
-            style={{ width: `${Math.min(100, Math.max(0, progressPercent))}%` }}
-          />
-        </div>
+        <p className="font-mono text-[11px] text-slate-500 dark:text-slate-400 mt-2">
+          {context}
+        </p>
       )}
     </div>
   );
@@ -141,25 +136,25 @@ export function MetricCard({
 
 // 4. EmptyState
 export function EmptyState({
-  icon,
   title,
   description,
   action,
 }: {
-  icon?: React.ReactNode;
   title: string;
   description: string;
   action?: React.ReactNode;
 }) {
   return (
-    <div className="glass-card p-12 rounded-[24px] text-center flex flex-col items-center justify-center">
-      <div className="w-12 h-12 rounded-2xl bg-[#635BFF]/10 text-[#635BFF] dark:text-[#36C8E8] flex items-center justify-center mb-4">
-        {icon || <Inbox className="w-6 h-6" />}
+    <div className="editorial-card p-12 text-center flex flex-col items-center justify-center">
+      <div className="w-10 h-10 border border-[#D72638] text-[#D72638] flex items-center justify-center mb-4 font-mono font-bold">
+        !
       </div>
-      <h3 className="font-display text-lg font-bold text-slate-900 dark:text-white mb-1">
+      <h3 className="font-display text-lg font-black uppercase text-slate-900 dark:text-white mb-1">
         {title}
       </h3>
-      <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mb-6">{description}</p>
+      <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mb-6 font-mono">
+        {description}
+      </p>
       {action}
     </div>
   );
@@ -171,7 +166,6 @@ export function ConfirmDialog({
   title,
   description,
   confirmLabel = "Confirm",
-  variant = "danger",
   loading = false,
   onConfirm,
   onCancel,
@@ -180,7 +174,6 @@ export function ConfirmDialog({
   title: string;
   description: string;
   confirmLabel?: string;
-  variant?: "danger" | "primary";
   loading?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
@@ -191,27 +184,27 @@ export function ConfirmDialog({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs"
     >
-      <div className="w-full max-w-md glass-panel p-6 rounded-[20px] shadow-2xl space-y-4">
+      <div className="w-full max-w-md editorial-card bg-[#121214] text-white p-6 space-y-4 border border-[#27272A]">
         <div className="flex items-start gap-3">
-          <div className="p-2.5 rounded-xl bg-[#DC4545]/10 text-[#DC4545] shrink-0">
-            <AlertTriangle className="w-5 h-5" />
+          <div className="p-2 border border-[#D72638] text-[#D72638] font-mono text-xs font-bold">
+            WARN
           </div>
           <div>
-            <h3 className="font-display text-lg font-bold text-slate-900 dark:text-white">
+            <h3 className="font-display text-base font-bold uppercase text-white">
               {title}
             </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
+            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
               {description}
             </p>
           </div>
         </div>
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200 dark:border-white/10">
-          <Button variant="ghost" size="sm" onClick={onCancel} disabled={loading}>
+        <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
+          <Button variant="secondary" size="sm" onClick={onCancel} disabled={loading}>
             Cancel
           </Button>
-          <Button variant={variant} size="sm" onClick={onConfirm} loading={loading}>
+          <Button variant="crimson" size="sm" onClick={onConfirm} loading={loading}>
             {confirmLabel}
           </Button>
         </div>

@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { apiClient } from "@/lib/api";
-import { ShieldCheck, UserPlus, Users, Shield, Plus } from "lucide-react";
+import { UserPlus, Shield, X } from "lucide-react";
+import { Button } from "@/components/ui/Primitives";
 
 interface StaffMember {
   id: string;
@@ -57,72 +58,78 @@ export default function StaffPage() {
       setNewUserId("");
       fetchStaff();
     } catch (err: any) {
-      alert(err.message || "Failed to add staff member");
+      alert(err.message || "Failed to assign staff member");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const roleColors: Record<string, string> = {
-    owner: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-    admin: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
-    staff: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    viewer: "bg-slate-500/10 text-slate-400 border-slate-500/20",
+  const roleStyles: Record<string, string> = {
+    owner: "bg-crimson text-white border-crimson",
+    admin: "bg-pitch text-cream dark:bg-cream dark:text-pitch border-pitch dark:border-cream",
+    staff: "bg-[#16A34A]/20 text-[#16A34A] border-[#16A34A]/40",
+    viewer: "bg-sand dark:bg-carbon text-pitch/70 dark:text-cream/70 border-pitch/20 dark:border-white/20",
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      {/* Editorial Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-pitch/10 dark:border-white/10">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Event Staff & Access Control</h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Manage granular roles (Owner, Admin, Check-in Staff, Viewer) for this specific event.
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2 h-2 bg-crimson inline-block" />
+            <span className="font-mono text-[11px] font-bold tracking-widest uppercase text-pitch/60 dark:text-cream/60">
+              05 // RBAC & PERMISSIONS
+            </span>
+          </div>
+          <h1 className="font-display text-3xl font-black tracking-tight text-pitch dark:text-cream uppercase">
+            Event Staff & Access Control
+          </h1>
+          <p className="font-mono text-xs text-pitch/60 dark:text-cream/60 mt-1">
+            Manage granular roles (Owner, Admin, Check-in Staff, Viewer) for this event instance.
           </p>
         </div>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 transition-all"
-        >
+        <Button size="sm" onClick={() => setShowAddModal(true)}>
           <UserPlus className="w-4 h-4" />
-          <span>Assign Staff Role</span>
-        </button>
+          <span>ASSIGN STAFF ROLE</span>
+        </Button>
       </div>
 
-      <div className="glass-panel rounded-2xl border border-white/10 overflow-hidden">
+      <div className="border border-pitch/20 dark:border-white/15 bg-cream dark:bg-pitch overflow-hidden shadow-brutal">
         {loading ? (
           <div className="py-24 flex items-center justify-center">
-            <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-4 border-crimson border-t-transparent animate-spin" />
           </div>
         ) : staff.length === 0 ? (
-          <div className="py-16 text-center text-slate-400 text-sm">
-            No staff records found.
+          <div className="py-16 text-center font-mono text-xs text-pitch/50 dark:text-cream/50 uppercase">
+            No staff records registered for this event.
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-900/50 text-slate-400 border-b border-white/5 uppercase tracking-wider font-semibold">
+            <table className="w-full text-left text-xs font-mono">
+              <thead className="bg-sand dark:bg-carbon text-pitch/70 dark:text-cream/70 border-b border-pitch/15 dark:border-white/10 text-[10px] uppercase tracking-wider">
                 <tr>
-                  <th className="px-5 py-3.5">Staff User ID (UUID)</th>
-                  <th className="px-5 py-3.5">Assigned Role</th>
-                  <th className="px-5 py-3.5">Assigned At</th>
+                  <th className="px-5 py-3.5">USER UUID</th>
+                  <th className="px-5 py-3.5">ASSIGNED PRIVILEGE</th>
+                  <th className="px-5 py-3.5">ASSIGNED AT</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-pitch/10 dark:divide-white/10">
                 {staff.map((member) => (
-                  <tr key={member.id} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="px-5 py-4 font-mono text-xs text-white">
+                  <tr key={member.id} className="hover:bg-sand/60 dark:hover:bg-carbon/60 transition-colors">
+                    <td className="px-5 py-4 font-mono text-xs font-bold text-pitch dark:text-cream">
                       {member.user_id}
                     </td>
                     <td className="px-5 py-4">
                       <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase border ${
-                          roleColors[member.role] || "bg-slate-800 text-slate-300"
+                        className={`px-2.5 py-1 text-[10px] font-bold uppercase border tracking-wider ${
+                          roleStyles[member.role] || "bg-sand text-pitch"
                         }`}
                       >
                         {member.role}
                       </span>
                     </td>
-                    <td className="px-5 py-4 text-slate-400">
+                    <td className="px-5 py-4 text-pitch/60 dark:text-cream/60 text-[11px]">
                       {new Date(member.created_at).toLocaleDateString()}
                     </td>
                   </tr>
@@ -134,16 +141,23 @@ export default function StaffPage() {
       </div>
 
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="w-full max-w-md glass-panel p-6 rounded-2xl border border-white/10 shadow-2xl">
-            <form onSubmit={handleAddStaff} className="space-y-4">
-              <h3 className="text-lg font-bold text-white">Assign Staff Member</h3>
-              <p className="text-xs text-slate-400">
-                Enter the Supabase User UUID and select their event privilege tier.
-              </p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-cream dark:bg-pitch border-2 border-pitch dark:border-white/20 p-6 shadow-brutal space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-pitch/15 dark:border-white/10">
+              <div className="flex items-center gap-2">
+                <Shield className="w-5 h-5 text-crimson" />
+                <h3 className="font-display text-base font-black uppercase text-pitch dark:text-cream">
+                  Assign Staff Member
+                </h3>
+              </div>
+              <button onClick={() => setShowAddModal(false)} className="hover:text-crimson">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
+            <form onSubmit={handleAddStaff} className="space-y-4 font-mono text-xs">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-pitch/70 dark:text-cream/70 mb-1">
                   Supabase User ID (UUID)
                 </label>
                 <input
@@ -151,17 +165,19 @@ export default function StaffPage() {
                   required
                   value={newUserId}
                   onChange={(e) => setNewUserId(e.target.value)}
-                  placeholder="3fa85f64-5717-4562-b3fc-2c963f66afa6"
-                  className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-white/10 text-sm text-white font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="00000000-0000-0000-0000-000000000001"
+                  className="w-full px-3.5 py-2.5 bg-sand dark:bg-carbon border border-pitch/20 dark:border-white/15 text-xs text-pitch dark:text-cream font-mono focus:outline-none focus:border-crimson"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Role Privilege</label>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-pitch/70 dark:text-cream/70 mb-1">
+                  Role Tier
+                </label>
                 <select
                   value={newRole}
                   onChange={(e) => setNewRole(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3.5 py-2.5 bg-sand dark:bg-carbon border border-pitch/20 dark:border-white/15 text-xs text-pitch dark:text-cream font-mono uppercase focus:outline-none focus:border-crimson"
                 >
                   <option value="staff">Staff (Gate Scanner Only)</option>
                   <option value="viewer">Viewer (Read-only Dashboards)</option>
@@ -170,21 +186,22 @@ export default function StaffPage() {
                 </select>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
-                <button
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-pitch/15 dark:border-white/10">
+                <Button
                   type="button"
+                  variant="secondary"
+                  size="sm"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-xl text-slate-400 hover:text-white text-sm"
                 >
-                  Cancel
-                </button>
-                <button
+                  CANCEL
+                </Button>
+                <Button
                   type="submit"
+                  size="sm"
                   disabled={submitting}
-                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/30 disabled:opacity-50"
                 >
-                  {submitting ? "Assigning..." : "Save Role"}
-                </button>
+                  {submitting ? "ASSIGNING..." : "CONFIRM ASSIGNMENT"}
+                </Button>
               </div>
             </form>
           </div>

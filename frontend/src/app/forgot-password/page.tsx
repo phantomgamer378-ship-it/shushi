@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { QrCode, Mail, ArrowLeft, ShieldCheck, AlertCircle } from "lucide-react";
+import { Mail, ArrowLeft, ShieldCheck, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/Primitives";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -30,83 +31,87 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-[#10172A] text-slate-100">
-      <div className="w-full max-w-md glass-panel p-8 rounded-[24px] border border-white/10 shadow-2xl">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-[10px] bg-gradient-to-tr from-[#635BFF] to-[#36C8E8] flex items-center justify-center text-white">
-            <QrCode className="w-5 h-5" />
+    <div className="min-h-screen flex items-center justify-center p-6 bg-cream dark:bg-pitch text-pitch dark:text-cream">
+      <div className="w-full max-w-md editorial-card p-8 shadow-brutal space-y-6">
+        <div className="flex items-center gap-3 pb-4 border-b border-pitch/10 dark:border-white/10">
+          <div className="w-9 h-9 bg-pitch text-cream dark:bg-cream dark:text-pitch font-mono font-black text-sm flex items-center justify-center border border-crimson">
+            SH
           </div>
           <div>
-            <h1 className="font-display text-xl font-bold text-white">Reset Password</h1>
-            <p className="text-xs text-slate-400">Shushi Staff Recovery</p>
+            <h1 className="font-display text-xl font-black uppercase text-pitch dark:text-cream tracking-tight">
+              Reset Password
+            </h1>
+            <p className="font-mono text-[10px] text-pitch/60 dark:text-cream/60 uppercase">
+              Shushi Staff Recovery
+            </p>
           </div>
         </div>
 
         {error && (
           <div
             role="alert"
-            className="mb-5 p-3.5 rounded-[10px] bg-[#DC4545]/10 border border-[#DC4545]/25 text-red-300 text-xs flex items-center gap-2.5"
+            className="p-3 bg-crimson/10 border-l-4 border-crimson font-mono text-xs text-crimson flex items-center gap-2"
           >
-            <AlertCircle className="w-4 h-4 shrink-0 text-[#DC4545]" />
+            <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         {sent ? (
-          <div className="space-y-5">
-            <div className="p-4 rounded-[12px] bg-[#16A34A]/10 border border-[#16A34A]/25 text-emerald-300 text-xs flex items-start gap-3">
-              <ShieldCheck className="w-5 h-5 shrink-0 text-[#16A34A]" />
+          <div className="space-y-5 font-mono text-xs">
+            <div className="p-4 bg-[#16A34A]/10 border-l-4 border-[#16A34A] text-[#16A34A] flex items-start gap-3">
+              <ShieldCheck className="w-5 h-5 shrink-0 mt-0.5" />
               <div>
-                <strong className="block font-semibold mb-1">Recovery Email Dispatched</strong>
-                If an account exists for <strong>{email}</strong>, you will receive a password reset link shortly.
+                <strong className="block font-bold uppercase mb-1">Recovery Email Dispatched</strong>
+                If an account exists for <strong className="underline">{email}</strong>, you will receive a secure password recovery link shortly.
               </div>
             </div>
             <Link
               href="/login"
-              className="w-full py-2.5 rounded-[10px] bg-[#635BFF] hover:bg-[#5249F5] text-white text-sm font-semibold flex items-center justify-center gap-2"
+              className="w-full py-2.5 bg-pitch text-cream dark:bg-cream dark:text-pitch font-mono font-bold uppercase text-xs flex items-center justify-center gap-2 border border-pitch dark:border-cream hover:bg-crimson hover:text-white transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Back to Sign In</span>
+              <span>RETURN TO SIGN IN</span>
             </Link>
           </div>
         ) : (
-          <form onSubmit={handleReset} className="space-y-4">
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Enter your registered staff email address and Supabase Auth will send you a secure password recovery link.
+          <form onSubmit={handleReset} className="space-y-4 font-mono text-xs">
+            <p className="text-pitch/70 dark:text-cream/70 text-[11px] leading-relaxed">
+              Enter your registered staff email address to receive a secure recovery token via Supabase Auth.
             </p>
             <div>
               <label
                 htmlFor="reset-email"
-                className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5"
+                className="block text-[10px] font-bold uppercase tracking-wider text-pitch/70 dark:text-cream/70 mb-1.5"
               >
-                Email Address
+                STAFF EMAIL ADDRESS
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Mail className="w-4 h-4 text-pitch/40 dark:text-cream/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   id="reset-email"
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="organizer@eventflow.io"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-[10px] bg-slate-900/80 border border-white/10 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#635BFF]"
+                  placeholder="organizer@shushi.io"
+                  className="w-full pl-10 pr-4 py-2.5 bg-sand dark:bg-carbon border border-pitch/20 dark:border-white/15 text-xs text-pitch dark:text-cream placeholder-pitch/30 dark:placeholder-cream/30 focus:outline-none focus:border-crimson"
                 />
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
+              className="w-full"
               disabled={loading}
-              className="w-full py-2.5 rounded-[10px] bg-[#635BFF] hover:bg-[#5249F5] text-white text-sm font-semibold shadow-lg shadow-[#635BFF]/25 disabled:opacity-50"
             >
-              {loading ? "Sending..." : "Send Recovery Link"}
-            </button>
+              {loading ? "DISPATCHING..." : "SEND RECOVERY LINK"}
+            </Button>
 
             <div className="text-center pt-2">
               <Link
                 href="/login"
-                className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white"
+                className="inline-flex items-center gap-1.5 text-xs text-pitch/60 dark:text-cream/60 hover:text-crimson transition-colors uppercase"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Return to Sign In</span>

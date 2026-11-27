@@ -3,17 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  QrCode,
-  Users,
-  BarChart3,
-  Settings,
-  ShieldCheck,
-  LayoutDashboard,
-  FileSpreadsheet,
-  ArrowLeft,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ArrowLeft } from "lucide-react";
 
 export function Sidebar({
   eventId,
@@ -27,13 +18,13 @@ export function Sidebar({
   const pathname = usePathname();
 
   const links = [
-    { href: `/events/${eventId}`, label: "Overview", icon: LayoutDashboard },
-    { href: `/events/${eventId}/scanner`, label: "QR Scanner", icon: QrCode, highlight: true },
-    { href: `/events/${eventId}/registrations`, label: "Registrations", icon: Users },
-    { href: `/events/${eventId}/attendance`, label: "Live Attendance", icon: BarChart3 },
-    { href: `/events/${eventId}/reports`, label: "Reports & Export", icon: FileSpreadsheet },
-    { href: `/events/${eventId}/staff`, label: "Staff & RBAC", icon: ShieldCheck },
-    { href: `/events/${eventId}/settings`, label: "Webhooks & Setup", icon: Settings },
+    { href: `/events/${eventId}`, label: "Overview", num: "01" },
+    { href: `/events/${eventId}/scanner`, label: "QR Scanner", num: "02", highlight: true },
+    { href: `/events/${eventId}/registrations`, label: "Registrations", num: "03" },
+    { href: `/events/${eventId}/attendance`, label: "Live Stream", num: "04" },
+    { href: `/events/${eventId}/reports`, label: "Reports", num: "05" },
+    { href: `/events/${eventId}/staff`, label: "Staff RBAC", num: "06" },
+    { href: `/events/${eventId}/settings`, label: "Webhooks", num: "07" },
   ];
 
   const navContent = (
@@ -42,14 +33,13 @@ export function Sidebar({
         <Link
           href="/events"
           onClick={onCloseMobile}
-          className="flex items-center gap-2 px-3.5 py-2 mb-3 rounded-[10px] text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-white/5 transition-colors"
+          className="flex items-center gap-2 px-3 py-2 mb-4 font-mono text-xs text-slate-400 hover:text-white border border-transparent hover:border-white/20 transition-colors uppercase tracking-wider"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>All Events</span>
         </Link>
 
         {links.map((link) => {
-          const Icon = link.icon;
           const isActive = pathname === link.href;
 
           return (
@@ -58,26 +48,24 @@ export function Sidebar({
               href={link.href}
               onClick={onCloseMobile}
               className={cn(
-                "flex items-center gap-3 px-3.5 py-2.5 rounded-[10px] text-sm font-medium transition-all duration-150",
+                "flex items-center justify-between px-3.5 py-2.5 font-mono text-xs uppercase tracking-wider transition-all duration-100 border",
                 isActive
-                  ? "bg-[#635BFF] text-white shadow-lg shadow-[#635BFF]/25"
+                  ? "bg-[#D72638] text-white border-[#D72638] font-bold"
                   : link.highlight
-                  ? "text-[#635BFF] dark:text-[#36C8E8] hover:bg-[#635BFF]/10"
-                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200"
+                  ? "border-[#D72638]/50 text-[#D72638] hover:bg-[#D72638] hover:text-white"
+                  : "border-transparent text-slate-400 hover:text-white hover:border-white/20"
               )}
             >
-              <Icon className="w-4 h-4 shrink-0" />
               <span>{link.label}</span>
+              <span className="opacity-75">{link.num}</span>
             </Link>
           );
         })}
       </div>
 
-      <div className="pt-4 border-t border-slate-200 dark:border-white/10 px-3 py-2 text-[11px] text-slate-400">
-        <div className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
-          Security Boundary
-        </div>
-        <div className="mt-0.5">Zero-PII Token Verification</div>
+      <div className="pt-4 border-t border-[#27272A] px-3 py-2 font-mono text-[10px] text-slate-500 uppercase tracking-widest">
+        <div>SECURITY BOUNDARY</div>
+        <div className="text-slate-400 mt-0.5">SHUSHI GATE ENGINE</div>
       </div>
     </div>
   );
@@ -85,7 +73,7 @@ export function Sidebar({
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="w-64 glass-panel border-r border-slate-200 dark:border-white/10 p-4 hidden md:flex flex-col min-h-[calc(100vh-57px)] shrink-0">
+      <aside className="w-60 bg-[#0A0A0C] border-r border-[#27272A] p-4 hidden md:flex flex-col min-h-[calc(100vh-53px)] shrink-0">
         {navContent}
       </aside>
 
@@ -93,10 +81,10 @@ export function Sidebar({
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden flex">
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/80 backdrop-blur-xs"
             onClick={onCloseMobile}
           />
-          <aside className="relative z-10 w-72 max-w-[80vw] bg-white dark:bg-[#10172A] border-r border-slate-200 dark:border-white/10 p-5 flex flex-col h-full shadow-2xl">
+          <aside className="relative z-10 w-64 bg-[#0A0A0C] border-r border-[#27272A] p-5 flex flex-col h-full shadow-2xl">
             {navContent}
           </aside>
         </div>

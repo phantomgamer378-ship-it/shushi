@@ -47,7 +47,7 @@ export async function apiClient<T>(endpoint: string, options: RequestInit = {}):
       problem = await response.json();
     } catch {
       problem = {
-        type: "https://errors.eventflow.io/UNKNOWN_ERROR",
+        type: "https://errors.shushi.io/UNKNOWN_ERROR",
         title: response.statusText || "Request Failed",
         status: response.status,
         detail: "An error occurred while communicating with the server.",
