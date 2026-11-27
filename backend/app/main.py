@@ -19,6 +19,9 @@ from app.core.exceptions import (
 from app.api.v1.health import router as health_router
 from app.api.v1.auth import router as auth_router
 from app.api.v1.events import router as events_router
+from app.api.v1.webhooks import router as webhooks_router
+from app.api.v1.registrations import router as registrations_router
+from app.api.v1.checkin import router as checkin_router
 
 logger = logging.getLogger("eventflow.app")
 
@@ -101,6 +104,9 @@ def create_app() -> FastAPI:
     app.include_router(health_router)
     app.include_router(auth_router, prefix=settings.API_V1_STR)
     app.include_router(events_router, prefix=settings.API_V1_STR)
+    app.include_router(webhooks_router, prefix=settings.API_V1_STR)
+    app.include_router(registrations_router, prefix=settings.API_V1_STR)
+    app.include_router(checkin_router, prefix=settings.API_V1_STR)
 
     return app
 

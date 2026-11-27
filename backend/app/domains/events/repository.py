@@ -6,7 +6,7 @@ from sqlalchemy import select
 from app.domains.events.models import Event
 from app.domains.staff.models import EventStaff
 from app.domains.events.schemas import EventCreate
-from app.core.security import hash_webhook_secret
+from app.core.security import encrypt_payload
 
 
 class EventRepository:
@@ -40,7 +40,8 @@ class EventRepository:
     ) -> tuple[Event, str]:
         # Generate initial raw webhook secret for the event
         raw_secret = secrets.token_hex(24)
-        secret_hash = hash_webhook_secret(raw_secret)
+        # Encrypt with AES-256-GCM for secure database storage
+        secret_encrypted = encrypt_payload(raw_secret)
 
         event = Event(
             slug=event_in.slug,
@@ -52,7 +53,7 @@ class EventRepository:
             timezone=event_in.timezone,
             max_capacity=event_in.max_capacity,
             status="DRAFT",
-            webhook_secret_hash=secret_hash,
+            webhook_secret_hash=secret_encrypted,
         )
         self.db.add(event)
         await self.db.flush()

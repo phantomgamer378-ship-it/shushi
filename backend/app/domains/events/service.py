@@ -19,7 +19,9 @@ class EventService:
             )
 
         event, raw_secret = await self.repo.create_event(event_in, creator_user_id)
-        return EventResponse.model_validate(event), raw_secret
+        resp = EventResponse.model_validate(event)
+        resp.webhook_secret = raw_secret
+        return resp, raw_secret
 
     async def get_event(self, event_id: UUID) -> EventResponse:
         event = await self.repo.get_by_id(event_id)

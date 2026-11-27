@@ -28,6 +28,7 @@ class EventResponse(BaseModel):
     timezone: str
     max_capacity: Optional[int]
     status: str
+    webhook_secret: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

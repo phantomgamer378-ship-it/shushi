@@ -16,13 +16,6 @@ async def client() -> AsyncGenerator[AsyncClient, None]:
         yield ac
 
 
-@pytest_asyncio.fixture
-async def db_session() -> AsyncGenerator[AsyncSession, None]:
-    """Provides an isolated async database session for tests."""
-    async with AsyncSessionLocal() as session:
-        yield session
-
-
 @pytest.fixture
 def user_a_id() -> uuid.UUID:
     return uuid.uuid4()

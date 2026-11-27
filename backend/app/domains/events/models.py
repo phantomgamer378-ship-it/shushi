@@ -27,7 +27,7 @@ class Event(Base):
     timezone = Column(String(64), nullable=False, default="Asia/Kolkata")
     max_capacity = Column(Integer, nullable=True)
     status = Column(String(32), nullable=False, default="DRAFT")
-    webhook_secret_hash = Column(String(128), nullable=False)
+    webhook_secret_hash = Column(String(256), nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at = Column(
         DateTime(timezone=True),
