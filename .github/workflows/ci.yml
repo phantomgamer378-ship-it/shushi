@@ -15,7 +15,7 @@ jobs:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://jkchyjghuaiyulxqzobl.supabase.co' }}
       SUPABASE_JWT_SECRET: ${{ secrets.SUPABASE_JWT_SECRET || 'fcc288de9da25ac8db036de254daa9aae95e1051-jwt-secret-mumbai-2026' }}
       DATA_ENCRYPTION_KEY: ${{ secrets.DATA_ENCRYPTION_KEY || 'k7b9X2pL0mQ8vR4tY1wZ6aC3eF5uI9oP4sD8gJ2hK1l=' }}
-      DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql+asyncpg://postgres.jkchyjghuaiyulxqzobl:EventFlow2026!SecureMumbaiDB@aws-1-ap-south-1.pooler.supabase.com:6543/postgres' }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql+asyncpg://postgres:password@localhost:5432/postgres' }}
 
     steps:
       - name: Check out repository

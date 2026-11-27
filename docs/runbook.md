@@ -91,7 +91,7 @@ If an event's webhook secret is accidentally leaked or compromised:
   Always set port 5432 (Session pooler) when executing DDL migrations:
   ```bash
   cd backend
-  DATABASE_URL="postgresql+asyncpg://postgres.jkchyjghuaiyulxqzobl:EventFlow2026!SecureMumbaiDB@aws-1-ap-south-1.pooler.supabase.com:5432/postgres" \
+  DATABASE_URL="postgresql+asyncpg://<DB_USER>:<DB_PASSWORD>@<DB_HOST>:5432/postgres" \
   .venv/bin/alembic upgrade head
   ```
 - **Checking Migration Status**:

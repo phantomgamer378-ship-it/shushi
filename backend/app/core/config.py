@@ -17,12 +17,12 @@ class Settings(BaseSettings):
     SUPABASE_ANON_KEY: str = Field(default="")
     SUPABASE_SERVICE_ROLE_KEY: str = Field(default="")
 
-    # Database URLs
+    # Database URLs (loaded strictly from environment variables in production)
     DATABASE_URL: str = Field(
-        default="postgresql+asyncpg://postgres.jkchyjghuaiyulxqzobl:EventFlow2026%21SecureMumbaiDB@aws-1-ap-south-1.pooler.supabase.com:6543/postgres"
+        default="postgresql+asyncpg://postgres:password@localhost:5432/postgres"
     )
     MIGRATION_DATABASE_URL: str = Field(
-        default="postgresql+asyncpg://postgres.jkchyjghuaiyulxqzobl:EventFlow2026%21SecureMumbaiDB@aws-1-ap-south-1.pooler.supabase.com:5432/postgres"
+        default="postgresql+asyncpg://postgres:password@localhost:5432/postgres"
     )
 
     # Database Pool Settings
