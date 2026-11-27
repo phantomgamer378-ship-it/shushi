@@ -9,7 +9,8 @@ export default function Home() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
+      const demoToken = typeof window !== "undefined" ? localStorage.getItem("shushi_demo_token") : null;
+      if (session || demoToken) {
         router.replace("/events");
       } else {
         router.replace("/login");

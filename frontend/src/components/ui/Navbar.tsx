@@ -23,7 +23,12 @@ export function Navbar({
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      setUserEmail(data.user?.email || null);
+      if (data.user?.email) {
+        setUserEmail(data.user.email);
+      } else if (typeof window !== "undefined") {
+        const demo = localStorage.getItem("shushi_demo_user");
+        if (demo) setUserEmail(demo);
+      }
     });
 
     if (typeof document !== "undefined") {
@@ -44,6 +49,10 @@ export function Navbar({
   };
 
   const handleLogout = async () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("shushi_demo_token");
+      localStorage.removeItem("shushi_demo_user");
+    }
     await supabase.auth.signOut();
     router.push("/login");
   };

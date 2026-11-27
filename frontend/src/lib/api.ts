@@ -22,9 +22,12 @@ export class ApiError extends Error {
 }
 
 export async function apiClient<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  // Get Supabase session JWT
+  // Get Supabase session JWT or fallback to demo session
   const { data: { session } } = await supabase.auth.getSession();
-  const token = session?.access_token;
+  let token = session?.access_token;
+  if (!token && typeof window !== "undefined") {
+    token = localStorage.getItem("shushi_demo_token") || undefined;
+  }
 
   const headers = new Headers(options.headers || {});
   headers.set("Content-Type", "application/json");

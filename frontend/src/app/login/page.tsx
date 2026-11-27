@@ -69,6 +69,29 @@ export default function LoginPage() {
     }
   };
 
+  const handleQuickDemo = async () => {
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/v1";
+      const res = await fetch(`${apiUrl}/auth/demo-session`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (data.access_token) {
+        localStorage.setItem("shushi_demo_token", data.access_token);
+        localStorage.setItem("shushi_demo_user", "organizer@shushi.io");
+        router.push("/events");
+      } else {
+        throw new Error("Unable to establish demo session.");
+      }
+    } catch (err: any) {
+      setErrorMessage(err.message || "Demo access failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex bg-[#10172A] text-slate-100 relative overflow-hidden">
       {/* Controlled Ambient Background Glow */}
@@ -104,9 +127,9 @@ export default function LoginPage() {
             </div>
 
             <h2 className="font-display text-xl font-bold text-white mb-1">
-              Global Tech Summit 2026
+              Shushi Fresher Party 2026
             </h2>
-            <p className="text-xs text-slate-400 mb-6">BKC Convention Center • Gate A1</p>
+            <p className="text-xs text-slate-400 mb-6">Main Campus Auditorium • Gate A1</p>
 
             <div className="p-4 rounded-[16px] bg-white flex items-center justify-between mb-5 shadow-inner">
               <div className="space-y-1">
@@ -189,6 +212,40 @@ export default function LoginPage() {
             </div>
           )}
 
+          {/* Instant 1-Click Demo Access Box */}
+          <div className="mb-6 p-4 rounded-[16px] bg-gradient-to-r from-[#635BFF]/15 to-[#36C8E8]/15 border border-[#36C8E8]/30 flex flex-col gap-2.5 shadow-lg shadow-[#635BFF]/10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-bold text-white">
+                <Sparkles className="w-4 h-4 text-[#36C8E8]" />
+                <span>Instant Demo Access</span>
+              </div>
+              <span className="text-[10px] font-mono uppercase bg-[#16A34A]/20 text-emerald-400 px-2 py-0.5 rounded-full font-semibold border border-[#16A34A]/30">
+                Active
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-300 leading-relaxed">
+              Explore the <strong>Shushi Fresher Party 2026</strong> event dashboard, live gate scanner, and attendee passes without typing credentials.
+            </p>
+            <button
+              type="button"
+              onClick={handleQuickDemo}
+              disabled={loading}
+              className="w-full py-2.5 px-3 rounded-[10px] bg-gradient-to-r from-[#635BFF] to-[#36C8E8] hover:opacity-95 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-[#635BFF]/25 active:scale-[0.99] transition-all"
+            >
+              <span>⚡ Enter Shushi Console (1-Click)</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <div className="relative flex items-center justify-center mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/10" />
+            </div>
+            <span className="relative px-3 bg-[#111827] text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+              Or Sign In With Email
+            </span>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
@@ -206,7 +263,7 @@ export default function LoginPage() {
                   autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="organizer@eventflow.io"
+                  placeholder="organizer@shushi.io"
                   className="w-full pl-10 pr-4 py-2.5 rounded-[10px] bg-slate-900/80 border border-white/10 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#635BFF]"
                 />
               </div>
