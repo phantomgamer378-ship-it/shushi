@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { apiClient } from "@/lib/api";
 import { Badge, Button, ConfirmDialog, EmptyState } from "@/components/ui/Primitives";
-import { Search, Mail, Phone, RefreshCw, Download, X, User, Ticket as TicketIcon, UserPlus, CheckCircle2, XCircle } from "lucide-react";
+import { Search, Mail, Phone, RefreshCw, Download, X, User, Ticket as TicketIcon, UserPlus, CheckCircle2, XCircle, QrCode, Copy, Check } from "lucide-react";
 
 interface Registration {
   id: string;
@@ -53,6 +53,29 @@ export default function RegistrationsPage() {
   // Drawer & Dialog state
   const [selectedReg, setSelectedReg] = useState<Registration | null>(null);
   const [revokeTargetTicketId, setRevokeTargetTicketId] = useState<string | null>(null);
+
+  // QR Viewer Modal / Drawer State
+  const [viewingQrTicketId, setViewingQrTicketId] = useState<string | null>(null);
+  const [qrData, setQrData] = useState<{ qr_payload: string; qr_image_data_url: string } | null>(null);
+  const [qrLoading, setQrLoading] = useState(false);
+  const [copiedPayload, setCopiedPayload] = useState(false);
+
+  const loadTicketQr = async (ticketId: string) => {
+    try {
+      setViewingQrTicketId(ticketId);
+      setQrLoading(true);
+      setQrData(null);
+      const res = await apiClient<{ qr_payload: string; qr_image_data_url: string }>(
+        `events/${eventId}/tickets/${ticketId}/qr`
+      );
+      setQrData(res);
+    } catch (err: any) {
+      alert(err.message || "Unable to retrieve QR code. If the pass was already dispatched, re-issue it to regenerate.");
+      setViewingQrTicketId(null);
+    } finally {
+      setQrLoading(false);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -622,16 +645,31 @@ export default function RegistrationsPage() {
                 </div>
 
                 {ticketByRegId.get(selectedReg.id) && (
-                  <div className="p-4 bg-sand dark:bg-carbon border border-pitch/15 dark:border-white/10 space-y-2">
-                    <div className="flex items-center gap-2 font-display font-bold text-pitch dark:text-cream text-xs uppercase">
-                      <TicketIcon className="w-4 h-4 text-crimson" />
-                      <span>CRYPTOGRAPHIC CREDENTIAL</span>
+                  <div className="p-4 bg-sand dark:bg-carbon border border-pitch/15 dark:border-white/10 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 font-display font-bold text-pitch dark:text-cream text-xs uppercase">
+                        <TicketIcon className="w-4 h-4 text-crimson" />
+                        <span>CRYPTOGRAPHIC CREDENTIAL</span>
+                      </div>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          const t = ticketByRegId.get(selectedReg.id);
+                          if (t) loadTicketQr(t.id);
+                        }}
+                      >
+                        <QrCode className="w-3.5 h-3.5" />
+                        <span>VIEW QR CODE</span>
+                      </Button>
                     </div>
-                    <div className="text-[10px] text-pitch/50 dark:text-cream/50">
-                      TOKEN SHA-256 HASH:
-                    </div>
-                    <div className="font-mono text-[10px] break-all text-pitch/80 dark:text-cream/80 bg-pitch/5 dark:bg-white/5 p-2">
-                      {ticketByRegId.get(selectedReg.id)?.token_hash}
+
+                    <div>
+                      <div className="text-[10px] text-pitch/50 dark:text-cream/50 uppercase tracking-wider mb-1">
+                        TOKEN SHA-256 HASH:
+                      </div>
+                      <div className="font-mono text-[10px] break-all text-pitch/80 dark:text-cream/80 bg-pitch/5 dark:bg-white/5 p-2 border border-pitch/10 dark:border-white/10">
+                        {ticketByRegId.get(selectedReg.id)?.token_hash}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -655,6 +693,91 @@ export default function RegistrationsPage() {
         onConfirm={confirmRevoke}
         onCancel={() => setRevokeTargetTicketId(null)}
       />
+
+      {/* QR Code Pass Preview Modal */}
+      {viewingQrTicketId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+          <div className="w-full max-w-sm bg-cream dark:bg-pitch border-2 border-pitch dark:border-white/20 p-6 shadow-brutal space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-pitch/15 dark:border-white/10">
+              <div className="flex items-center gap-2">
+                <QrCode className="w-5 h-5 text-crimson" />
+                <h3 className="font-display text-sm font-black uppercase text-pitch dark:text-cream">
+                  Digital Pass QR Code
+                </h3>
+              </div>
+              <button
+                onClick={() => {
+                  setViewingQrTicketId(null);
+                  setQrData(null);
+                }}
+                className="hover:text-crimson"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {qrLoading ? (
+              <div className="py-12 flex flex-col items-center justify-center space-y-3">
+                <RefreshCw className="w-6 h-6 animate-spin text-crimson" />
+                <span className="font-mono text-xs text-pitch/60 dark:text-cream/60">Decrypting pass payload...</span>
+              </div>
+            ) : qrData ? (
+              <div className="space-y-4">
+                <div className="flex justify-center p-4 bg-white border border-pitch/20 rounded shadow-inner">
+                  <img
+                    src={qrData.qr_image_data_url}
+                    alt="Attendee QR Pass"
+                    className="w-56 h-56 object-contain"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-[10px] font-mono text-pitch/60 dark:text-cream/60 uppercase">
+                    <span>Scanner Raw Token Payload</span>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(qrData.qr_payload);
+                        setCopiedPayload(true);
+                        setTimeout(() => setCopiedPayload(false), 2000);
+                      }}
+                      className="flex items-center gap-1 text-crimson hover:underline"
+                    >
+                      {copiedPayload ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                      <span>{copiedPayload ? "COPIED" : "COPY"}</span>
+                    </button>
+                  </div>
+                  <div className="p-2 font-mono text-[10px] break-all bg-pitch/5 dark:bg-white/5 border border-pitch/10 dark:border-white/10 text-pitch dark:text-cream">
+                    {qrData.qr_payload}
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <a
+                    href={qrData.qr_image_data_url}
+                    download={`ticket-${viewingQrTicketId}.png`}
+                    className="flex-1"
+                  >
+                    <Button size="sm" className="w-full">
+                      <Download className="w-3.5 h-3.5" />
+                      <span>DOWNLOAD PNG</span>
+                    </Button>
+                  </a>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      setViewingQrTicketId(null);
+                      setQrData(null);
+                    }}
+                  >
+                    CLOSE
+                  </Button>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

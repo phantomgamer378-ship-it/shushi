@@ -8,12 +8,13 @@ from sqlalchemy import select
 
 from app.core.database import get_db_session
 from app.core.rbac import require_event_role, EventRole, EventStaffContext
-from app.core.security import hash_token, encrypt_payload
+from app.core.security import hash_token, encrypt_payload, decrypt_payload
 from app.domains.registrations.models import Registration
 from app.domains.ticketing.models import Ticket
 from app.domains.email.models import EmailOutbox
 from app.domains.events.models import Event
 from app.domains.audit.models import AuditLog
+from app.domains.email.qr import generate_qr_code_png
 from app.domains.registrations.schemas import (
     RegistrationResponse,
     TicketResponse,
@@ -161,3 +162,52 @@ async def resend_or_reissue_ticket(
     await db.commit()
 
     return {"status": "success", "ticket_id": str(ticket.id), "message": "Ticket reissued and email queued."}
+
+
+@router.get("/tickets/{ticket_id}/qr")
+async def get_ticket_qr(
+    event_id: UUID,
+    ticket_id: UUID,
+    context: EventStaffContext = Depends(require_event_role(EventRole.VIEWER)),
+    db: AsyncSession = Depends(get_db_session),
+):
+    """
+    Retrieves the QR code payload and image for an attendee's pass from the outbox.
+    Available to organizers/staff to preview or assist attendees with gate entry.
+    """
+    import base64
+    query = select(Ticket).where(Ticket.id == ticket_id, Ticket.event_id == event_id)
+    res = await db.execute(query)
+    ticket = res.scalars().first()
+
+    if not ticket:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"code": "TICKET_NOT_FOUND", "message": "Ticket does not exist for this event."},
+        )
+
+    outbox_res = await db.execute(
+        select(EmailOutbox)
+        .where(EmailOutbox.ticket_id == ticket_id)
+        .order_by(EmailOutbox.created_at.desc())
+    )
+    outbox = outbox_res.scalars().first()
+
+    if not outbox or not outbox.encrypted_token_payload:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"code": "QR_NOT_AVAILABLE", "message": "Encrypted QR payload not available in outbox. Use re-issue to regenerate."},
+        )
+
+    raw_token = decrypt_payload(outbox.encrypted_token_payload)
+    qr_payload = f"ef:v1:{raw_token}"
+    png_bytes = generate_qr_code_png(raw_token)
+    b64_img = base64.b64encode(png_bytes).decode("ascii")
+
+    return {
+        "status": "success",
+        "ticket_id": str(ticket.id),
+        "qr_payload": qr_payload,
+        "qr_image_data_url": f"data:image/png;base64,{b64_img}",
+    }
+
