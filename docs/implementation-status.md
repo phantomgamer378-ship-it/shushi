@@ -1,9 +1,10 @@
 # EventFlow — Implementation Status & Phase Roadmap
 
-**Current Phase**: Phase 1: Product Discovery and System Architecture  
+**Current Phase**: Phase 2: Backend Foundation, Database and Security  
 **Phase Status**: COMPLETED  
 **Overall Project Health**: GREEN  
-**Target Database**: Supabase PostgreSQL 17 (`ap-south-1` Mumbai) — Provisioned & Verified  
+**Target Database**: Supabase PostgreSQL 17.12 (`ap-south-1` Mumbai) — Fully Migrated & Operational  
+**Test Suite**: 12/12 Tests Passing  
 **Last Updated**: 2026-11-27
 
 ---
@@ -12,29 +13,24 @@
 
 | Phase | Description | Status | Completion Target |
 | :---: | :--- | :---: | :---: |
-| **Phase 1** | **Product Discovery & System Architecture** | **COMPLETED** | Current |
-| **Phase 2** | Backend Core Foundations & Database Migrations | PENDING | Phase 2 Instruction |
+| **Phase 1** | Product Discovery & System Architecture | COMPLETED | Done |
+| **Phase 2** | **Backend Foundation, Database and Security** | **COMPLETED** | Current |
 | **Phase 3** | Domain Business Logic, Webhooks, Tickets & Outbox | PENDING | Phase 3 Instruction |
 | **Phase 4** | Gate Scanner PWA, Dashboard Frontend & Integration | PENDING | Phase 4 Instruction |
 | **Phase 5** | Production Readiness, Concurrency Testing & CI/CD | PENDING | Phase 5 Instruction |
 
 ---
 
-## 2. Phase 1 Deliverables & Acceptance Checklist
+## 2. Phase 2 Deliverables & Acceptance Checklist
 
-| Requirement / Deliverable | Target Document / Location | Status | Notes |
+| Requirement / Deliverable | Target Location | Status | Verification & Notes |
 | :--- | :--- | :---: | :--- |
-| **Step 1: Repository Inspection** | `docs/architecture.md` (Sec. 1) | PASS | Workspace inspected; clean slate; Supabase DB provisioned. |
-| **Step 2: Requirement Engineering** | `docs/architecture.md` (Sec. 2) | PASS | 12 Functional & 9 Non-functional requirements defined. |
-| **Step 3: Define User Roles** | `docs/architecture.md` (Sec. 3) | PASS | 5 User roles defined with full permission matrix. |
-| **Step 4: High-Level Architecture Design**| `docs/architecture.md` (Sec. 4) | PASS | System Context, Container, Component & 3 Sequence diagrams. |
-| **Step 5: Domain Design** | `docs/architecture.md` (Sec. 5) | PASS | 9 Bounded contexts defined with rules and failure modes. |
-| **Step 6: Domain States** | `docs/architecture.md` (Sec. 6) | PASS | State machines for Registration, Ticket, Email, and Check-in. |
-| **Step 7: Data Flow & Idempotency** | `docs/architecture.md` (Sec. 7) | PASS | Google Apps Script -> FastAPI -> DB -> Worker -> Resend. |
-| **Step 8: Database Design & ERD** | `docs/database-design.md` | PASS | 9 Core tables, ER diagram, constraints, indexes & concurrency. |
-| **Step 9: API Contract Design** | `docs/api-contracts.md` | PASS | REST `/v1` endpoints, schemas, status codes, and error codes. |
-| **Step 10: Security Threat Model** | `docs/threat-model.md` | PASS | 13 STRIDE threats analyzed with mitigations & test scenarios. |
-| **Step 11: Monorepo Project Structure** | `docs/architecture.md` (Sec. 8) | PASS | Taxonomy for `frontend/`, `backend/`, `automation/`, `infra/`. |
-| **Step 12: Architecture Review** | `docs/architecture.md` (Sec. 9) | PASS | Validated against complexity, circular deps, and race conditions. |
-| **Architecture Decision Records** | `docs/decisions/ADR-0001` to `0006` | PASS | 6 Accepted ADRs covering key architectural commitments. |
-| **Database Provisioning (ap-south-1)**| Supabase `jkchyjghuaiyulxqzobl` | PASS | Mumbai cluster active; pooler & GoTrue endpoints tested. |
+| **1. Backend Runnable** | `backend/app/main.py` | PASS | Lifespan, pure ASGI middleware, centralized RFC 7807 problem details handlers. |
+| **2. Database Connection** | `backend/app/core/database.py` | PASS | Supabase Supavisor dual-pool topology (`ap-south-1` Mumbai); unnamed prepared statements. |
+| **3. Alembic Migrations** | `backend/alembic/versions/accbdd7d445f_*` | PASS | Migration `accbdd7d445f` applied to live PostgreSQL 17 cluster; all 9 tables created. |
+| **4. Valid Staff Authentication**| `backend/app/core/security.py` | PASS | Supabase Auth HS256 JWT decoding with signature, issuer, audience, and exp checks. |
+| **5. Invalid/Expired Auth Rejected**| `backend/tests/test_auth.py` | PASS | Expired (401), invalid signature (401), missing token (401) all verified. |
+| **6. Cross-Event Access Denied**| `backend/app/core/rbac.py` | PASS | IDOR prevented; User B denied access to User A's event with 403 Forbidden. |
+| **7. Database Constraints Verified**| `backend/tests/test_db_constraints.py` | PASS | Unique `external_form_response_id` and unique `ticket_id` in `check_ins` verified on DB. |
+| **8. Automated Tests Pass** | `backend/tests/` | PASS | 12/12 tests passing across auth, RBAC, DB constraints, health, and cryptography. |
+| **9. Zero Real Secrets in Repo**| `.gitignore`, `.env.example` | PASS | `.env` strictly ignored by git; `.env.example` sanitized. |

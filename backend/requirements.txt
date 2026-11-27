@@ -6,9 +6,11 @@ sqlalchemy==2.0.36
 asyncpg==0.30.0
 alembic==1.14.0
 cryptography==43.0.3
+pyjwt[crypto]==2.10.1
 qrcode[pil]==8.0
-resend==2.5.0
+resend==2.6.0
 httpx==0.28.0
 pytest==8.3.3
 pytest-asyncio==0.24.0
 python-dotenv==1.0.1
+greenlet==3.5.6

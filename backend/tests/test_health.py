@@ -1,13 +1,29 @@
-from fastapi.testclient import TestClient
-from app.main import app
-
-client = TestClient(app)
+import pytest
 
 
-def test_health_check_endpoint():
-    response = client.get("/v1/health")
-    assert response.status_code == 200
-    data = response.json()
+@pytest.mark.asyncio
+async def test_liveness_probe(client):
+    res = await client.get("/health/live")
+    assert res.status_code == 200
+    assert res.json() == {"status": "alive"}
+    assert "X-Request-ID" in res.headers
+    assert "X-Response-Time-Ms" in res.headers
+
+
+@pytest.mark.asyncio
+async def test_readiness_probe(client):
+    res = await client.get("/health/ready")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "ready"
+    assert data["database"] == "connected"
+    assert data["region"] == "ap-south-1"
+
+
+@pytest.mark.asyncio
+async def test_generic_health(client):
+    res = await client.get("/v1/health")
+    assert res.status_code == 200
+    data = res.json()
     assert data["status"] == "healthy"
     assert data["service"] == "EventFlow"
-    assert data["region"] == "ap-south-1"
