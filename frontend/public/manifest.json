@@ -1,6 +1,6 @@
 {
-  "name": "EventFlow | Event Operations & Gate Scanner",
-  "short_name": "EventFlow",
+  "name": "Shushi | Event Operations & Gate Scanner",
+  "short_name": "Shushi",
   "description": "High-Throughput Multi-Event RSVP, Digital Ticketing & Atomic QR Gate Admission",
   "start_url": "/events",
   "display": "standalone",

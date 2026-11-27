@@ -5,7 +5,7 @@ import json
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "EventFlow"
+    PROJECT_NAME: str = "Shushi"
     ENVIRONMENT: str = Field(default="development")
     API_V1_STR: str = "/v1"
 

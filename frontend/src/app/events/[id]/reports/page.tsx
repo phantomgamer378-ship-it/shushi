@@ -69,7 +69,7 @@ export default function ReportsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `eventflow-attendance-report-${eventId.slice(0, 8)}.csv`;
+    a.download = `shushi-attendance-report-${eventId.slice(0, 8)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };

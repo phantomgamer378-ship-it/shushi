@@ -26,4 +26,4 @@ async def test_generic_health(client):
     assert res.status_code == 200
     data = res.json()
     assert data["status"] == "healthy"
-    assert data["service"] == "EventFlow"
+    assert data["service"] == "Shushi"

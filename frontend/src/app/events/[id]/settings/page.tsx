@@ -36,7 +36,7 @@ export default function EventSettingsPage() {
     : `https://api.eventflow.io/v1/webhooks/google-forms/${event?.id || eventId}`;
 
   const sampleAppsScript = `/**
- * Google Apps Script Webhook Forwarder for EventFlow
+ * Google Apps Script Webhook Forwarder for Shushi
  * Attach this script to your Google Form or linked Google Sheet.
  */
 function onFormSubmit(e) {
@@ -99,7 +99,7 @@ function onFormSubmit(e) {
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-white">Google Forms Webhook Configuration</h1>
         <p className="text-xs text-slate-400 mt-1">
-          Connect your Google Form or Google Sheet to EventFlow for instant, cryptographically verified RSVP ingestion.
+          Connect your Google Form or Google Sheet to Shushi for instant, cryptographically verified RSVP ingestion.
         </p>
       </div>
 

@@ -21,7 +21,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "EventFlow | The Future of Effortless Event Management",
+  title: "Shushi | The Future of Effortless Event Management",
   description:
     "Enterprise multi-event RSVP ingestion, cryptographic digital ticketing, and atomic QR code gate admission.",
   manifest: "/manifest.json",

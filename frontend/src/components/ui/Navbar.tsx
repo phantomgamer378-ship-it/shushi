@@ -68,7 +68,7 @@ export function Navbar({
           <div className="w-8 h-8 rounded-[10px] bg-gradient-to-tr from-[#635BFF] to-[#36C8E8] flex items-center justify-center text-white shadow-lg shadow-[#635BFF]/25 group-hover:scale-105 transition-transform">
             <QrCode className="w-4 h-4" />
           </div>
-          <span>EventFlow</span>
+          <span>Shushi</span>
         </Link>
 
         {eventId && eventTitle && (

@@ -38,7 +38,7 @@ export default function ForgotPasswordPage() {
           </div>
           <div>
             <h1 className="font-display text-xl font-bold text-white">Reset Password</h1>
-            <p className="text-xs text-slate-400">EventFlow Staff Recovery</p>
+            <p className="text-xs text-slate-400">Shushi Staff Recovery</p>
           </div>
         </div>
 
