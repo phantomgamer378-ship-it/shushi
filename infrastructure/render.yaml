@@ -1,0 +1,52 @@
+services:
+  # FastAPI Web Service
+  - type: web
+    name: eventflow-api
+    env: python
+    region: singapore # Closest Render region to Supabase Mumbai
+    plan: starter
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /v1/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: TICKET_ENCRYPTION_KEY
+        generateValue: true
+      - key: RESEND_API_KEY
+        sync: false
+
+  # Background Worker for Email & QR Delivery
+  - type: worker
+    name: eventflow-worker
+    env: python
+    region: singapore
+    plan: starter
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python worker.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: TICKET_ENCRYPTION_KEY
+        fromService:
+          type: web
+          name: eventflow-api
+          envVarKey: TICKET_ENCRYPTION_KEY
+      - key: RESEND_API_KEY
+        sync: false
