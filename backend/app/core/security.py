@@ -68,17 +68,41 @@ def decrypt_payload(encrypted_hex: str, key_hex: Optional[str] = None) -> str:
     return decrypted.decode("utf-8")
 
 
+_jwks_client: Optional[jwt.PyJWKClient] = None
+
+
+def get_jwks_client() -> jwt.PyJWKClient:
+    global _jwks_client
+    if _jwks_client is None:
+        jwks_url = f"{settings.SUPABASE_URL.rstrip('/')}/auth/v1/.well-known/jwks.json"
+        _jwks_client = jwt.PyJWKClient(jwks_url, cache_jwk_set=True, lifespan=3600)
+    return _jwks_client
+
+
 def decode_supabase_jwt(token: str) -> Dict[str, Any]:
     """
     Decodes and validates a Supabase Auth JWT.
-    Enforces signature, expiration, audience, issuer, and algorithm.
+    Supports both modern ES256/RS256 asymmetric keys via Supabase JWKS
+    and HS256 symmetric keys via SUPABASE_JWT_SECRET.
     """
     try:
-        # Supabase GoTrue issues tokens signed with the project JWT Secret (HS256)
+        unverified_header = jwt.get_unverified_header(token)
+        alg = unverified_header.get("alg", "HS256")
+
+        if alg in ("ES256", "RS256"):
+            try:
+                client = get_jwks_client()
+                signing_key = client.get_signing_key_from_jwt(token)
+                key = signing_key.key
+            except Exception as e:
+                raise jwt.InvalidTokenError(f"JWKS key lookup failed: {str(e)}")
+        else:
+            key = settings.SUPABASE_JWT_SECRET
+
         payload = jwt.decode(
             token,
-            settings.SUPABASE_JWT_SECRET,
-            algorithms=["HS256"],
+            key,
+            algorithms=["HS256", "ES256", "RS256"],
             audience="authenticated",
             options={
                 "verify_signature": True,
