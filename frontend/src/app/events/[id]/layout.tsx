@@ -20,6 +20,7 @@ export default function EventLayout({ children }: { children: React.ReactNode })
   const params = useParams();
   const eventId = params.id as string;
   const [event, setEvent] = useState<EventDetail | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (eventId) {
@@ -30,11 +31,20 @@ export default function EventLayout({ children }: { children: React.ReactNode })
   }, [eventId]);
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col">
-      <Navbar eventId={eventId} eventTitle={event?.title} />
+    <div className="min-h-screen flex flex-col">
+      <Navbar
+        eventId={eventId}
+        eventTitle={event?.title}
+        mobileMenuOpen={mobileMenuOpen}
+        onToggleMobileMenu={() => setMobileMenuOpen((prev) => !prev)}
+      />
       <div className="flex-1 flex">
-        <Sidebar eventId={eventId} />
-        <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto overflow-y-auto">
+        <Sidebar
+          eventId={eventId}
+          mobileOpen={mobileMenuOpen}
+          onCloseMobile={() => setMobileMenuOpen(false)}
+        />
+        <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl w-full mx-auto overflow-y-auto">
           {children}
         </main>
       </div>
