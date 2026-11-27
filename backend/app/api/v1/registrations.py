@@ -14,7 +14,11 @@ from app.domains.ticketing.models import Ticket
 from app.domains.email.models import EmailOutbox
 from app.domains.events.models import Event
 from app.domains.audit.models import AuditLog
-from app.domains.registrations.schemas import RegistrationResponse, TicketResponse
+from app.domains.registrations.schemas import (
+    RegistrationResponse,
+    TicketResponse,
+    ManualRegistrationCreate,
+)
 
 router = APIRouter(prefix="/events/{event_id}", tags=["Registrations & Ticketing"])
 
@@ -29,6 +33,20 @@ async def list_event_registrations(
     query = select(Registration).where(Registration.event_id == event_id).order_by(Registration.registered_at.desc())
     res = await db.execute(query)
     return [RegistrationResponse.model_validate(r) for r in res.scalars().all()]
+
+
+@router.post("/registrations", response_model=RegistrationResponse, status_code=status.HTTP_201_CREATED)
+async def create_event_registration(
+    event_id: UUID,
+    payload: ManualRegistrationCreate,
+    context: EventStaffContext = Depends(require_event_role(EventRole.ADMIN)),
+    db: AsyncSession = Depends(get_db_session),
+):
+    """Manually registers an attendee (Name, Email, Phone, URN, Attending) with atomic token issuance."""
+    from app.domains.registrations.service import RegistrationService
+    service = RegistrationService(db)
+    registration, _ = await service.create_manual_registration(event_id, payload)
+    return registration
 
 
 @router.get("/tickets", response_model=List[TicketResponse])

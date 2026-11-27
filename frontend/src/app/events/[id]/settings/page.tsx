@@ -50,20 +50,30 @@ function onFormSubmit(e) {
   var name = "Guest";
   var email = "";
   var phone = "";
+  var urn = "";
+  var attending = "Yes";
   
   for (var i = 0; i < itemResponses.length; i++) {
     var title = itemResponses[i].getItem().getTitle().toLowerCase();
     var val = itemResponses[i].getResponse();
-    if (title.indexOf("name") !== -1) name = val;
+    if (title.indexOf("name") !== -1 && title.indexOf("attend") === -1) name = val;
     if (title.indexOf("email") !== -1) email = val;
-    if (title.indexOf("phone") !== -1) phone = val;
+    if (title.indexOf("phone") !== -1 || title.indexOf("contact") !== -1) phone = val;
+    if (title.indexOf("urn") !== -1 || title.indexOf("roll") !== -1 || title.indexOf("reg") !== -1) urn = val;
+    if (title.indexOf("attend") !== -1) attending = val;
   }
 
   var payloadObj = {
     response_id: responseId,
     name: name,
     email: email,
-    phone: phone
+    phone: phone,
+    urn: urn,
+    attending: attending,
+    custom_fields: {
+      urn: urn,
+      attending: attending
+    }
   };
 
   var payloadJson = JSON.stringify(payloadObj);

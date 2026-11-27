@@ -23,6 +23,7 @@ class Registration(Base):
     attendee_name = Column(String(256), nullable=False)
     attendee_email = Column(String(256), nullable=False)
     attendee_phone = Column(String(64), nullable=True)
+    urn = Column(String(64), nullable=True)
     metadata_json = Column("metadata", JSONB, nullable=False, default=dict)
     status = Column(String(32), nullable=False, default="CONFIRMED")
     registered_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())

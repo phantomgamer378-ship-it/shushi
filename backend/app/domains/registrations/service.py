@@ -12,7 +12,11 @@ from app.domains.ticketing.models import Ticket
 from app.domains.email.models import EmailOutbox
 from app.domains.webhooks.models import WebhookReceipt
 from app.domains.audit.models import AuditLog
-from app.domains.registrations.schemas import GoogleFormsWebhookPayload, RegistrationResponse
+from app.domains.registrations.schemas import (
+    GoogleFormsWebhookPayload,
+    ManualRegistrationCreate,
+    RegistrationResponse,
+)
 from app.core.security import hash_token, encrypt_payload
 
 
@@ -114,6 +118,28 @@ class RegistrationService:
         )
         self.db.add(receipt)
 
+        # Determine attending status from payload
+        attending_answer = (payload.attending or "").strip().lower()
+        if not attending_answer and payload.custom_fields:
+            attending_answer = str(
+                payload.custom_fields.get("attending")
+                or payload.custom_fields.get("are_you_attending")
+                or ""
+            ).strip().lower()
+
+        is_attending = attending_answer not in ("no", "not attending", "false", "0")
+        reg_status = "CONFIRMED" if is_attending else "CANCELLED"
+
+        # Resolve URN from direct field or custom_fields
+        urn_val = (payload.urn or "").strip() or None
+        if not urn_val and payload.custom_fields:
+            urn_val = str(payload.custom_fields.get("urn") or payload.custom_fields.get("URN") or "").strip() or None
+
+        meta_dict = dict(payload.custom_fields or {})
+        if urn_val:
+            meta_dict["urn"] = urn_val
+        meta_dict["attending"] = "Yes" if is_attending else "No"
+
         # 6. Create Registration Record
         registration = Registration(
             event_id=event_id,
@@ -121,11 +147,29 @@ class RegistrationService:
             attendee_name=payload.name.strip(),
             attendee_email=normalized_email,
             attendee_phone=payload.phone.strip() if payload.phone else None,
-            metadata_json=payload.custom_fields or {},
-            status="CONFIRMED",
+            urn=urn_val,
+            metadata_json=meta_dict,
+            status=reg_status,
         )
         self.db.add(registration)
         await self.db.flush()
+
+        # If attendee declined ("No"), do NOT issue a ticket pass
+        if not is_attending:
+            audit = AuditLog(
+                event_id=event_id,
+                action="REGISTRATION_DECLINED",
+                entity_type="registration",
+                entity_id=registration.id,
+                payload_diff={
+                    "form_response_id": payload.response_id,
+                    "email": normalized_email,
+                    "attending": "No",
+                },
+            )
+            self.db.add(audit)
+            await self.db.commit()
+            return RegistrationResponse.model_validate(registration), "declined"
 
         # 7. Generate Cryptographically Secure 256-bit Random Token
         raw_token = secrets.token_urlsafe(32)
@@ -163,9 +207,32 @@ class RegistrationService:
                 "form_response_id": payload.response_id,
                 "email": normalized_email,
                 "ticket_id": str(ticket.id),
+                "urn": urn_val,
             },
         )
         self.db.add(audit)
 
         await self.db.commit()
         return RegistrationResponse.model_validate(registration), "registered"
+
+    async def create_manual_registration(
+        self,
+        event_id: UUID,
+        payload: ManualRegistrationCreate,
+    ) -> Tuple[RegistrationResponse, str]:
+        synthetic_response_id = f"MANUAL-{secrets.token_hex(8)}"
+        webhook_payload = GoogleFormsWebhookPayload(
+            response_id=synthetic_response_id,
+            name=payload.name,
+            email=payload.email,
+            phone=payload.phone,
+            urn=payload.urn,
+            attending=payload.attending or "Yes",
+            custom_fields={"source": "manual_entry", "urn": payload.urn, "attending": payload.attending},
+        )
+        raw_bytes = synthetic_response_id.encode("utf-8")
+        return await self.process_google_forms_submission(
+            event_id=event_id,
+            payload=webhook_payload,
+            raw_body_bytes=raw_bytes,
+        )
